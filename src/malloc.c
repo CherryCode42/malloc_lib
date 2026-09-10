@@ -1,5 +1,11 @@
 #include "../inc/malloc.h"
 
+static t_allocator g_allocator = {
+	.tiny = NULL,
+	.small = NULL,
+	.large = NULL
+};
+
 void	*tiny_malloc(size_t size) {
 
 }
@@ -10,8 +16,7 @@ void	*small_malloc(size_t size) {
 
 void	*large_malloc(size_t size) {
 	size_t metadata_size = sizeof(t_zone) + sizeof(t_block);
-	if (metadata_size % 16 != 0)
-		metadata_size = 16 - metadata_size % 16 + metadata_size;
+	metadata_size = round_metadata(metadata_size);
 	size_t real_size = metadata_size + size;
 	long page_size = sysconf(_SC_PAGE_SIZE);
 	if (real_size % page_size != 0)
@@ -28,12 +33,18 @@ void	*large_malloc(size_t size) {
 	new_block->is_free = 0;
 	new_block->next = NULL;
 	new_block->block_size = size;
+	if (g_allocator.large != NULL) {
+		t_zone * last_large_zone = find_last_zone(g_allocator.large);
+		last_large_zone->next = new_zone;
+	}
+	else
+		g_allocator.large = new_zone;
 	return (current + metadata_size);
 }
 
 void	*malloc(size_t size) {
 	if (size < TINY)
-		return (tiny_mlloc(size));
+		return (tiny_malloc(size));
 	else if (size < SMALL)
 		return (small_malloc(size));
 	else
