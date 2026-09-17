@@ -12,6 +12,10 @@
 #define TINY 128
 #define SMALL 4096
 
+#define TINY_ZONE 16384
+#define SMALL_ZONE 413696
+
+
 typedef struct s_block {
 	size_t block_size;
 	bool is_free;

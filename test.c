@@ -9,7 +9,7 @@ int main(void)
 	ptr = malloc(100);
 	printf("ptr = %p\n", (void *)ptr);
 
-	show_alloc_mem();
+	//show_alloc_mem();
 	//free(ptr);
 	return (0);
 }

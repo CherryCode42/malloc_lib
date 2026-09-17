@@ -1,2 +1,11 @@
 gcc test.c -I./inc -L. -lft_malloc -o test - compile test with library
 LD_LIBRARY_PATH=. ./test - stert program with the library
+
+
+c2r9s7% ./size_count 
+t_block = 32 bytes
+t_zone = 40 bytes
+
+TINY 128 bytes --> 128*100 + 32*100 + 40 = 12800 + 3200 + 40 = 16040 => mman needed 4 pages 4*4096=16384
+
+SMALL 4096 bytes --> 4096*100 + 32*100 + 40 = 409600 + 3200 + 40 = 412840 => mman needed 101 page 101*4096=413696

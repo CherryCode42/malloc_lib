@@ -12,3 +12,4 @@ t_zone	*find_last_zone(t_zone *start) {
 		last_zone = last_zone->next;
 	return (last_zone);
 }
+
