@@ -53,5 +53,6 @@ void	*large_malloc(size_t size);
 size_t	round_metadata(size_t metadata_size);
 t_zone	*find_last_zone(t_zone *start);
 void	show_alloc_mem();
+char* end_of_block(t_block* block);
 
 #endif
