@@ -54,7 +54,6 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size) {
 }
 
 void	*tiny_malloc(size_t size) {
-	void* mem_addr;
 	t_block* new_block = NULL;
 	new_block = lockate_new_data(new_block, g_allocator.tiny, size);
 	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
@@ -80,8 +79,8 @@ void	*tiny_malloc(size_t size) {
 			new_block->prev = NULL;
 			new_block->is_free = 0;
 	}
-	mem_addr = (char*)new_block + sizeof(t_block);
-	return (mem_addr);
+	new_block->user_mem_addr = (char*)new_block + sizeof(t_block);
+	return (new_block->user_mem_addr );
 }
 
 // void	*small_malloc(size_t size) {
@@ -101,18 +100,18 @@ void	*large_malloc(size_t size) {
 	t_block* new_block = (t_block*)(current + sizeof(t_zone));
 	new_zone->blocks = new_block;
 	new_zone->zone_size = real_size;
-	new_zone->md_size = metadata_size;
 	new_zone->next = NULL;
 	new_block->is_free = 0;
 	new_block->next = NULL;
 	new_block->block_size = size;
+	new_block->user_mem_addr = current + metadata_size;
 	if (g_allocator.large != NULL) {
 		t_zone * last_large_zone = find_last_zone(g_allocator.large);
 		last_large_zone->next = new_zone;
 	}
 	else
 		g_allocator.large = new_zone;
-	return (current + metadata_size);
+	return (new_block->user_mem_addr);
 }
 
 void	*malloc(size_t size) {

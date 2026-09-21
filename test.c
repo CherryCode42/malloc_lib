@@ -7,7 +7,7 @@ int main(void)
 	char *ptr;
 
 	ptr = malloc(100);
-	printf("ptr = %p\n", (void *)ptr);
+	//printf("ptr = %p\n", (void *)ptr);
 
 	show_alloc_mem();
 	//free(ptr);

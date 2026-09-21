@@ -19,13 +19,13 @@
 typedef struct s_block {
 	size_t block_size;
 	bool is_free;
+	void *user_mem_addr;
 	struct s_block  *prev;
 	struct s_block *next;
 } t_block;
 
 typedef struct s_zone {
 	int count;
-	size_t md_size; //metadata
 	size_t zone_size;
 	t_block* blocks;
 	struct s_zone *next;
