@@ -1,5 +1,5 @@
 gcc test.c -I./inc -L. -lft_malloc -o test - compile test with library
-LD_LIBRARY_PATH=. ./test - stert program with the library
+LD_LIBRARY_PATH=. ./test - start program with the library
 
 
 c2r9s7% ./size_count 

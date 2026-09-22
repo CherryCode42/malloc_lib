@@ -10,8 +10,21 @@ void show_alloc_mem() {
 		while (cur_zone != NULL) {
 			printf("TINY : %p\n", cur_zone);
 			while (cur_block != NULL) {
-				printf("%p - %p", cur_block->user_mem_addr, cur_block->user_mem_addr + cur_block->block_size);
-				printf(" : %li bytes\n", g_allocator.tiny->blocks->block_size);
+				printf("%p - %p", (void*)cur_block->user_mem_addr, (void*)cur_block->user_mem_addr + cur_block->block_size);
+				printf(" : %li bytes\n", cur_block->block_size);
+				cur_block = cur_block->next;
+			}
+			cur_zone = cur_zone->next;
+		}
+	}
+	if (g_allocator.small != NULL) {
+		cur_zone = g_allocator.small;
+		cur_block = cur_zone->blocks;
+		while (cur_zone != NULL) {
+			printf("SMALL : %p\n", cur_zone);
+			while (cur_block != NULL) {
+				printf("%p - %p", (void*)cur_block->user_mem_addr, (void*)cur_block->user_mem_addr + cur_block->block_size - 1);
+				printf(" : %li bytes\n", cur_block->block_size);
 				cur_block = cur_block->next;
 			}
 			cur_zone = cur_zone->next;
@@ -19,8 +32,8 @@ void show_alloc_mem() {
 	}
 	while (g_allocator.large != NULL) {
 		printf("LARGE : %p\n", g_allocator.large);
-		printf("%p - %p", g_allocator.large->blocks->user_mem_addr,  g_allocator.large->blocks->user_mem_addr +  g_allocator.large->blocks->block_size);
-		printf(" : %li bytes", g_allocator.large->blocks->block_size);
+		printf("%p - %p", (void*)g_allocator.large->blocks->user_mem_addr, (void*)g_allocator.large->blocks->user_mem_addr +  g_allocator.large->blocks->block_size);
+		printf(" : %li bytes\n", g_allocator.large->blocks->block_size);
 		g_allocator.large = g_allocator.large->next;
 	}
 }

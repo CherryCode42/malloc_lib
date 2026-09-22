@@ -13,8 +13,9 @@ t_zone	*find_last_zone(t_zone *start) {
 	return (last_zone);
 }
 
-char* end_of_block(t_block* block) {
-	char* block_end;
-	block_end = (char*)block + sizeof(t_block) + block->block_size - 1;
+uintptr_t end_of_block(t_block* block) {
+	uintptr_t block_end;
+	
+	block_end = (uintptr_t)block + sizeof(t_block) + block->block_size - 1;
 	return (block_end);
 }

@@ -22,9 +22,9 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size) {
 	t_block* cur_block = zone->blocks;
 	size_t diff = TINY; //difference between needed size and free amount of bytes in block
 	size_t cur_diff; //we need two of them to remember the lowest
-	char* zone_end; //last byte of zone
+	uintptr_t zone_end; //last byte of zone
 
-	zone_end = (char*)zone + TINY_ZONE - 1;
+	zone_end = (uintptr_t)zone + TINY_ZONE - 1;
 	while (cur_zone!= NULL) {
 		while (cur_block != NULL) {
 			if (cur_block->block_size >= size && cur_block->is_free) {
@@ -53,7 +53,8 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size) {
 	return (new_block);
 }
 
-void	*tiny_malloc(size_t size) {
+void* tiny_malloc(size_t size) {
+	void* addr;
 	t_block* new_block = NULL;
 	new_block = lockate_new_data(new_block, g_allocator.tiny, size);
 	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
@@ -79,15 +80,47 @@ void	*tiny_malloc(size_t size) {
 			new_block->prev = NULL;
 			new_block->is_free = 0;
 	}
-	new_block->user_mem_addr = (char*)new_block + sizeof(t_block);
-	return (new_block->user_mem_addr );
+	new_block->user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
+	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+	addr = (void*)new_block->user_mem_addr;
+	return (addr);
 }
 
-// void	*small_malloc(size_t size) {
-	
-// }
+void	*small_malloc(size_t size) {
+	void* addr;
+	t_block* new_block = NULL;
+	new_block = lockate_new_data(new_block, g_allocator.small, size);
+	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
+			void *ptr =	mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			if (ptr == MAP_FAILED)
+				return (NULL);
+			char *current = (char *)ptr;
+			t_zone* new_zone = (t_zone*)current;
+			if (g_allocator.small == NULL)
+				g_allocator.small = new_zone;
+			else {
+				t_zone* temp = g_allocator.small;
+				while (temp->next != NULL)
+					temp = temp->next;
+				temp->next = new_zone;
+			}
+			new_block = (t_block*)(current + sizeof(t_zone));
+			new_zone->count = 1;
+			new_zone->next = NULL;
+			new_zone->blocks = new_block;
+			new_block->block_size = size;
+			new_block->next = NULL;
+			new_block->prev = NULL;
+			new_block->is_free = 0;
+	}
+	new_block->user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
+	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+	addr = (void*)new_block->user_mem_addr;
+	return (addr);
+}
 
 void	*large_malloc(size_t size) {
+	void* addr;
 	size_t metadata_size = sizeof(t_zone) + sizeof(t_block);
 	metadata_size = round_metadata(metadata_size); //do metadata size divisible by 16 for the efficiency
 	size_t real_size = metadata_size + size;
@@ -95,7 +128,7 @@ void	*large_malloc(size_t size) {
 	void *ptr =	mmap(NULL, real_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (ptr == MAP_FAILED)
 		return (NULL);
-	char *current = (char *)ptr;
+	uintptr_t current = (uintptr_t)ptr;
 	t_zone* new_zone = (t_zone*)current;
 	t_block* new_block = (t_block*)(current + sizeof(t_zone));
 	new_zone->blocks = new_block;
@@ -104,21 +137,23 @@ void	*large_malloc(size_t size) {
 	new_block->is_free = 0;
 	new_block->next = NULL;
 	new_block->block_size = size;
-	new_block->user_mem_addr = current + metadata_size;
+	new_block->user_mem_addr = current + metadata_size - 1;
 	if (g_allocator.large != NULL) {
 		t_zone * last_large_zone = find_last_zone(g_allocator.large);
 		last_large_zone->next = new_zone;
 	}
 	else
 		g_allocator.large = new_zone;
-	return (new_block->user_mem_addr);
+	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+	addr = (void*)new_block->user_mem_addr;
+	return (addr);
 }
 
 void	*malloc(size_t size) {
-	if (size < TINY)
+	if (size <= TINY)
 		return (tiny_malloc(size));
-	// else if (size < SMALL)
-	// 	return (small_malloc(size));
+	else if (TINY < size && size <= SMALL)
+		return (small_malloc(size));
 	// else
 	// long int block_size =  sizeof(t_block);
 	// long int zone_size =  sizeof(t_zone);

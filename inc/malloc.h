@@ -5,9 +5,12 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <sys/mman.h>
+
+#define ALIGNMENT 16
 
 #define TINY 128
 #define SMALL 4096
@@ -19,7 +22,7 @@
 typedef struct s_block {
 	size_t block_size;
 	bool is_free;
-	void *user_mem_addr;
+	uintptr_t user_mem_addr;
 	struct s_block  *prev;
 	struct s_block *next;
 } t_block;
@@ -53,6 +56,6 @@ void	*large_malloc(size_t size);
 size_t	round_metadata(size_t metadata_size);
 t_zone	*find_last_zone(t_zone *start);
 void	show_alloc_mem();
-char* end_of_block(t_block* block);
+uintptr_t end_of_block(t_block* block);
 
 #endif
