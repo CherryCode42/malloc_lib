@@ -13,14 +13,14 @@ static size_t round_zone(size_t real_size) {
 	return (real_size);
 }
 
-t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size) {
+t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode) {
 	t_zone* cur_zone = zone;
 
 	if (zone == NULL)
 		return (NULL);
 
 	t_block* cur_block = zone->blocks;
-	size_t diff = TINY; //difference between needed size and free amount of bytes in block
+	size_t diff = mode; //difference between needed size and free amount of bytes in block
 	size_t cur_diff; //we need two of them to remember the lowest
 	uintptr_t zone_end; //last byte of zone
 
@@ -36,10 +36,12 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size) {
 			}
 			if (cur_block->next == NULL) {
 				size_t rest_amount_mem = zone_end - end_of_block(cur_block);
-				if (rest_amount_mem > size + sizeof(t_block)) { //if there is space after all occupied blocks in zone
+				if (rest_amount_mem > size + sizeof(t_block)) {	//if there is space after all occupied blocks in zone
 					new_block = (t_block*)((char*)cur_block + cur_block->block_size + sizeof(t_block));	//we can allocate new block there
 					cur_block->next = new_block;
 					new_block->next = NULL;
+					uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
+					new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 					new_block->prev = cur_block;
 					new_block->block_size = size;
 					new_block->is_free = 0;
@@ -56,7 +58,7 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size) {
 void* tiny_malloc(size_t size) {
 	void* addr;
 	t_block* new_block = NULL;
-	new_block = lockate_new_data(new_block, g_allocator.tiny, size);
+	new_block = lockate_new_data(new_block, g_allocator.tiny, size, TINY);
 	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
 			void *ptr =	mmap(NULL, TINY_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			if (ptr == MAP_FAILED)
@@ -72,6 +74,8 @@ void* tiny_malloc(size_t size) {
 				temp->next = new_zone;
 			}
 			new_block = (t_block*)(current + sizeof(t_zone));
+			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
+			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 			new_zone->count = 1;
 			new_zone->next = NULL;
 			new_zone->blocks = new_block;
@@ -80,8 +84,6 @@ void* tiny_malloc(size_t size) {
 			new_block->prev = NULL;
 			new_block->is_free = 0;
 	}
-	new_block->user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
-	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 	addr = (void*)new_block->user_mem_addr;
 	return (addr);
 }
@@ -89,7 +91,7 @@ void* tiny_malloc(size_t size) {
 void	*small_malloc(size_t size) {
 	void* addr;
 	t_block* new_block = NULL;
-	new_block = lockate_new_data(new_block, g_allocator.small, size);
+	new_block = lockate_new_data(new_block, g_allocator.small, size, SMALL);
 	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
 			void *ptr =	mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			if (ptr == MAP_FAILED)
@@ -155,9 +157,9 @@ void	*malloc(size_t size) {
 	else if (TINY < size && size <= SMALL)
 		return (small_malloc(size));
 	// else
-	// long int block_size =  sizeof(t_block);
-	// long int zone_size =  sizeof(t_zone);
-	// printf("sizeof t_block %zu = ", block_size);
-	// printf("\nsizeof t_zone %zu = ", zone_size);
+	long int block_size =  sizeof(t_block);
+	long int zone_size =  sizeof(t_zone);
+	printf("sizeof t_block = %zu\n", block_size);
+	printf("sizeof t_zone = %zu\n", zone_size);
 	return (large_malloc(size));
 }

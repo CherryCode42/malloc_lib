@@ -19,9 +19,9 @@ void show_alloc_mem() {
 	}
 	if (g_allocator.small != NULL) {
 		cur_zone = g_allocator.small;
-		cur_block = cur_zone->blocks;
 		while (cur_zone != NULL) {
 			printf("SMALL : %p\n", cur_zone);
+			cur_block = cur_zone->blocks;
 			while (cur_block != NULL) {
 				printf("%p - %p", (void*)cur_block->user_mem_addr, (void*)cur_block->user_mem_addr + cur_block->block_size - 1);
 				printf(" : %li bytes\n", cur_block->block_size);

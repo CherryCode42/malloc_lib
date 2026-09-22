@@ -15,8 +15,8 @@
 #define TINY 128
 #define SMALL 4096
 
-#define TINY_ZONE 16384
-#define SMALL_ZONE 413696
+#define TINY_ZONE 20480
+#define SMALL_ZONE 417792
 
 
 typedef struct s_block {
@@ -44,18 +44,19 @@ extern t_allocator g_allocator; //means: There is only one g_allocator in the wh
 
 
 //malloc
-// void	*tiny_malloc(size_t size);
-// void	*small_malloc(size_t size);
-void	*large_malloc(size_t size);
+void		*tiny_malloc(size_t size);
+void		*small_malloc(size_t size);
+void		*large_malloc(size_t size);
+t_block*	lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode);
 
 //realloc
 
 //free
 
 //utils
-size_t	round_metadata(size_t metadata_size);
-t_zone	*find_last_zone(t_zone *start);
-void	show_alloc_mem();
-uintptr_t end_of_block(t_block* block);
+size_t		round_metadata(size_t metadata_size);
+t_zone		*find_last_zone(t_zone *start);
+void		show_alloc_mem();
+uintptr_t	end_of_block(t_block* block);
 
 #endif
