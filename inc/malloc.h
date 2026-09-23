@@ -10,17 +10,20 @@
 #include <stdbool.h>
 #include <sys/mman.h>
 
+#define DEBUG 1
+
 #define ALIGNMENT 16
 
 #define TINY 128
 #define SMALL 4096
 
 #define TINY_ZONE 20480
-#define SMALL_ZONE 417792
+#define SMALL_ZONE 40960
 
 
 typedef struct s_block {
 	size_t block_size;
+	size_t tale; //part wich is rest afer aligning user addr (needed for control during developing, can be deleted)
 	bool is_free;
 	uintptr_t user_mem_addr;
 	struct s_block  *prev;
@@ -47,7 +50,7 @@ extern t_allocator g_allocator; //means: There is only one g_allocator in the wh
 void		*tiny_malloc(size_t size);
 void		*small_malloc(size_t size);
 void		*large_malloc(size_t size);
-t_block*	lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode);
+t_block*	lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size);
 
 //realloc
 
