@@ -33,6 +33,8 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 				if (cur_diff < diff) { //check the difference if its lower we need to allockate in this block
 					diff = cur_diff; 
 					new_block = cur_block;
+					if (new_block->block_size - size > sizeof(t_block))
+						devide_blocks(new_block, size);
 				}
 			}
 			if (cur_block->next == NULL) {

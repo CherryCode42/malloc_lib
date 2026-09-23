@@ -18,7 +18,7 @@
 #define SMALL 4096
 
 #define TINY_ZONE 20480
-#define SMALL_ZONE 40960
+#define SMALL_ZONE 417792 // for demonstrating can be establish to 40960, to show how it add new zones
 
 
 typedef struct s_block {
@@ -59,7 +59,10 @@ t_block*	lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 //utils
 size_t		round_metadata(size_t metadata_size);
 t_zone		*find_last_zone(t_zone *start);
-void		show_alloc_mem();
 uintptr_t	end_of_block(t_block* block);
+void		devide_blocks(t_block* block, size_t size);
+
+//printing memory
+void		show_alloc_mem();
 
 #endif
