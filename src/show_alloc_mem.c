@@ -6,8 +6,8 @@ void show_alloc_mem() {
 
 	if (g_allocator.tiny != NULL) {
 		cur_zone = g_allocator.tiny;
-		cur_block = cur_zone->blocks;
 		while (cur_zone != NULL) {
+			cur_block = cur_zone->blocks;
 			printf("TINY : %p\n", cur_zone);
 			while (cur_block != NULL) {
 				printf("%p - %p", (void*)cur_block->user_mem_addr, (void*)cur_block->user_mem_addr + cur_block->block_size);

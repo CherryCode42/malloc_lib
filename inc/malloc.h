@@ -23,7 +23,7 @@
 
 typedef struct s_block {
 	size_t block_size;
-	size_t tale; //part wich is rest afer aligning user addr (needed for control during developing, can be deleted)
+	size_t tale; //part wich is rest afer aligning user addr (needed when free block and unite with neighbours)
 	bool is_free;
 	uintptr_t user_mem_addr;
 	struct s_block  *prev;
@@ -35,6 +35,7 @@ typedef struct s_zone {
 	size_t zone_size;
 	t_block* blocks;
 	struct s_zone *next;
+	struct s_zone *prev;
 } t_zone;
 
 typedef struct s_allocator {

@@ -143,13 +143,16 @@ void	*large_malloc(size_t size) {
 	new_zone->blocks = new_block;
 	new_zone->zone_size = real_size;
 	new_zone->next = NULL;
+	new_zone->prev = NULL;
 	new_block->is_free = 0;
 	new_block->next = NULL;
+	new_block->prev = NULL;
 	new_block->block_size = size;
 	new_block->user_mem_addr = current + metadata_size - 1;
 	if (g_allocator.large != NULL) {
 		t_zone * last_large_zone = find_last_zone(g_allocator.large);
 		last_large_zone->next = new_zone;
+		new_zone->prev = last_large_zone;
 	}
 	else
 		g_allocator.large = new_zone;

@@ -6,6 +6,6 @@ c2r9s7% ./size_count
 t_block = 40 bytes
 t_zone = 32 bytes
 
-TINY 128 bytes --> 128*100 + 48*100 + 32 = 12800 + 4800 + 32 = 176832 => mman needed 5 pages 5*4096=20480 - extra 20480 - 176832 =
+TINY 128 bytes --> 128*100 + 48*100 + 40 = 12800 + 4800 + 40 = 176840 => mman needed 5 pages 5*4096=20480 - extra 20480 - 176832 =
 
-SMALL 4096 bytes --> 4096*100 + 48*100 + 32 = 409600 + 4800 + 32 = 413632 => mman needed 102 page 102*4096 = 417792
+SMALL 4096 bytes --> 4096*100 + 48*100 + 40 = 409600 + 4800 + 40 = 413640 => mman needed 102 page 102*4096 = 417792
