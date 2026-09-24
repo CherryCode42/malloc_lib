@@ -22,6 +22,13 @@ int main(void)
 	//printf("ptr = %p\n", (void *)ptr);
 
 	show_alloc_mem();
-	//free(ptr);
+	free(ptr_tiny);
+	free(ptr_tiny_1);
+	free(ptr_large);
+	free(ptr_lagre_1);
+	while (nb < 11) {
+		ptr_small = malloc(4095);
+		nb++;
+	}
 	return (0);
 }

@@ -46,7 +46,6 @@ typedef struct s_allocator {
 
 extern t_allocator g_allocator; //means: There is only one g_allocator in the whole program (it's in malloc.c)
 
-
 //malloc
 void		*tiny_malloc(size_t size);
 void		*small_malloc(size_t size);
@@ -56,14 +55,18 @@ t_block*	lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 //realloc
 
 //free
+void	free(void *addr);
+void	free_zone(t_zone* zone, size_t zone_size);
 
 //utils
 size_t		round_metadata(size_t metadata_size);
+size_t		round_zone(size_t real_size);
 t_zone		*find_last_zone(t_zone *start);
 uintptr_t	end_of_block(t_block* block);
 void		devide_blocks(t_block* block, size_t size);
 
 //printing memory
-void		show_alloc_mem();
+void	show_alloc_mem();
+int		zone_is_free(t_zone* zone);
 
 #endif

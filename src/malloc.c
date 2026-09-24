@@ -6,13 +6,6 @@ t_allocator g_allocator = {
 	.large = NULL
 };
 
-static size_t round_zone(size_t real_size) {
-	long page_size = sysconf(_SC_PAGE_SIZE);
-	if (real_size % page_size != 0)
-		real_size = page_size - real_size % page_size + real_size;
-	return (real_size);
-}
-
 t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size) {
 	t_zone* cur_zone = zone;
 
@@ -148,7 +141,7 @@ void	*large_malloc(size_t size) {
 	new_block->next = NULL;
 	new_block->prev = NULL;
 	new_block->block_size = size;
-	new_block->user_mem_addr = current + metadata_size - 1;
+	new_block->user_mem_addr = current + metadata_size;
 	if (g_allocator.large != NULL) {
 		t_zone * last_large_zone = find_last_zone(g_allocator.large);
 		last_large_zone->next = new_zone;
@@ -156,7 +149,6 @@ void	*large_malloc(size_t size) {
 	}
 	else
 		g_allocator.large = new_zone;
-	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 	addr = (void*)new_block->user_mem_addr;
 	return (addr);
 }

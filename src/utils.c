@@ -6,6 +6,13 @@ size_t	round_metadata(size_t metadata_size) {
 	return (metadata_size);
 }
 
+size_t round_zone(size_t real_size) {
+	long page_size = sysconf(_SC_PAGE_SIZE);
+	if (real_size % page_size != 0)
+		real_size = page_size - real_size % page_size + real_size;
+	return (real_size);
+}
+
 t_zone	*find_last_zone(t_zone *start) {
 	t_zone *last_zone = start;
 	while (last_zone->next != NULL)
@@ -35,4 +42,16 @@ void	devide_blocks(t_block* block, size_t size) {
 	block->next = new_block;
 	new_block->block_size = (uintptr_t)new_block->next - new_block->user_mem_addr - 1;
 	new_block->is_free = 1;
+}
+
+int	zone_is_free(t_zone* zone) {
+	t_block* cur_block;
+
+	cur_block = zone->blocks;
+	while (cur_block != NULL) {
+		if (!cur_block->is_free)
+			return (0);
+		cur_block = cur_block->next;
+	}
+	return (1);
 }
