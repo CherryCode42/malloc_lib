@@ -1,5 +1,56 @@
 #include "../inc/malloc.h"
 
+// #ifdef DEBUG
+// 	#include <dlfcn.h>
+// 	static void* (*real_malloc)(size_t) = NULL;
+// 	static void (*real_free)(void*) = NULL;
+// 	static void* (*real_realloc)(void*, size_t) = NULL;
+// 	static int use_custom_malloc = 1; // менять через break poin   0 - используются системные функции, 1- твои
+// #endif
+
+// __attribute__((constructor))
+// void init()
+// {
+// 	#ifdef DEBUG
+// 		real_malloc = dlsym(((void *) - 1l), "malloc"); // set variable use_custom_malloc = 1 in WATCH
+// 		real_free = dlsym(((void *) - 1l), "free");
+// 		real_realloc = dlsym(((void *) - 1l), "realloc");
+// 		if (!use_custom_malloc)
+// 			return;
+// 	#endif
+// }
+
+// void *malloc(size_t size) {
+// 	#ifdef DEBUG
+// 		if (!use_custom_malloc) {
+// 			void* result = real_malloc(size);
+// 			return result;
+// 		}
+// 	#endif
+// }
+
+// void free(void * ptr) {
+// 	#ifdef DEBUG
+// 		if (!use_custom_malloc) {
+// 			real_free(ptr);
+// 			return;
+// 		}
+// 	#endif
+// 	if (!ptr) {
+// 		return;
+// 	}
+// }
+
+// void *realloc(void * ptr, size_t size) {
+// 	#ifdef DEBUG
+// 		if (!use_custom_malloc) {
+// 		void* result = real_realloc(ptr, size);
+// 			return result;
+// 		}
+// 	#endif
+// }
+
+
 t_allocator g_allocator = {
 	.tiny = NULL,
 	.small = NULL,

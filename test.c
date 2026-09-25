@@ -22,13 +22,18 @@ int main(void)
 	//printf("ptr = %p\n", (void *)ptr);
 
 	show_alloc_mem();
+	printf("Before tiny\n");
 	free(ptr_tiny);
+	printf("After tiny\n");
 	free(ptr_tiny_1);
+	printf("Before large\n");
 	free(ptr_large);
-	free(ptr_lagre_1);
-	while (nb < 11) {
-		ptr_small = malloc(4095);
-		nb++;
-	}
+	printf("After large\n");
+	// free(ptr_lagre_1);
+
+	// while (nb < 11) {
+	// 	ptr_small = malloc(4095);
+	// 	nb++;
+	// }
 	return (0);
 }
