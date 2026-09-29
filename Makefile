@@ -4,7 +4,7 @@ MAKE	=	make
 LIBFT	=	$(LIBFT_PATH)libft.a
 
 CC	=	gcc
-CFLAGS	=	-Wall -Wextra -Werror -fPIC
+CFLAGS	=	-g -Wall -Wextra -Werror -fPIC
 
 SRC_PATH	=	./src/
 OBJ_PATH	=	./obj/
