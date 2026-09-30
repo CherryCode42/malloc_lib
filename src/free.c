@@ -31,7 +31,6 @@ void free_zone(t_zone* zone, size_t zone_size) {
 	}
 }
 
-
 void	free(void *addr) {
 	uintptr_t temp_addr;
 	t_zone* cur_zone = NULL;
@@ -84,7 +83,7 @@ void	free(void *addr) {
 						prev->block_size += sizeof(t_block) + cur_block->tale + cur_block->block_size;
 						cur_block = prev;
 					}
-					free_zone(cur_zone, TINY_ZONE);
+					free_zone(cur_zone, SMALL_ZONE);
 					return ;
 				}
 				cur_block = cur_block->next;

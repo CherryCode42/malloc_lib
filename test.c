@@ -41,7 +41,7 @@ int main(void)
 	ptr_small_12 = malloc(4095);
 	ptr_small_13 = malloc(4095);
 	ptr_small_14 = malloc(4095);
-	ptr_large = malloc(4100);
+	ptr_large = malloc(300*1024*1024);
 	ptr_lagre_1 = malloc(80847);
 
 	show_alloc_mem();
@@ -49,7 +49,7 @@ int main(void)
 	free(ptr_tiny);
 	printf("After tiny\n");
 	free(ptr_tiny_1);
-	printf("Before small\n");
+	//printf("Before small\n");
 	free(ptr_small);
 	free(ptr_small_1);
 	free(ptr_small_2);
@@ -65,10 +65,10 @@ int main(void)
 	free(ptr_small_12);
 	free(ptr_small_13);
 	free(ptr_small_14);
-	printf("After small\n");
-	printf("Before large\n");
+	//printf("After small\n");
+	//printf("Before large\n");
 	free(ptr_large);
-	printf("After large\n");
+	//printf("After large\n");
 	free(ptr_lagre_1);
 
 	return (0);

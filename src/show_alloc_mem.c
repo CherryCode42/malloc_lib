@@ -8,7 +8,7 @@ void show_alloc_mem() {
 		cur_zone = g_allocator.tiny;
 		while (cur_zone != NULL) {
 			cur_block = cur_zone->blocks;
-			printf("TINY : %p\n", cur_zone);
+			write(1, "TINY : ", 7);
 			while (cur_block != NULL) {
 				printf("%p - %p", (void*)cur_block->user_mem_addr, (void*)cur_block->user_mem_addr + cur_block->block_size);
 				printf(" : %li bytes\n", cur_block->block_size);
@@ -23,7 +23,7 @@ void show_alloc_mem() {
 	if (g_allocator.small != NULL) {
 		cur_zone = g_allocator.small;
 		while (cur_zone != NULL) {
-			printf("SMALL : %p\n", cur_zone);
+			write(1, "SMALL : ", 8);
 			cur_block = cur_zone->blocks;
 			while (cur_block != NULL) {
 				printf("%p - %p", (void*)cur_block->user_mem_addr, (void*)cur_block->user_mem_addr + cur_block->block_size - 1);
@@ -39,7 +39,7 @@ void show_alloc_mem() {
 	if (g_allocator.large != NULL) {
 		cur_zone = g_allocator.large;
 		while (cur_zone != NULL) {
-			printf("LARGE : %p\n", cur_zone);
+			write(1, "LARGE : ", 8);
 			printf("%p - %p", (void*)cur_zone->blocks->user_mem_addr, (void*)cur_zone->blocks->user_mem_addr + cur_zone->blocks->block_size);
 			printf(" : %li bytes\n", cur_zone->blocks->block_size);
 			cur_zone = cur_zone->next;

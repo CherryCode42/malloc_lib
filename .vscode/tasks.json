@@ -10,7 +10,7 @@
                 "-Wall",
                 "-Wextra",
                 "-Werror",
-                "/${workspaceFolder}/test.c",
+                "/${workspaceFolder}/test_002.c",
 				"-I./inc",
 				 "-L.",
 				 "-lft_malloc"
