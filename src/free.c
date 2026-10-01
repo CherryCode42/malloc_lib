@@ -57,6 +57,14 @@ void	free(void *addr) {
 						prev->block_size += sizeof(t_block) + cur_block->tale + cur_block->block_size;
 						cur_block = prev;
 					}
+					if (cur_block->next && cur_block->next->is_free) {
+						t_block* next = cur_block->next;
+						if (next->next)
+							cur_block->next = next->next;
+						else
+							cur_block->next = NULL;
+						cur_block->block_size += sizeof(t_block) + next->tale + next->block_size;
+					}
 					free_zone(cur_zone, TINY_ZONE);
 					return ;
 				}
@@ -82,6 +90,14 @@ void	free(void *addr) {
 							prev->next = NULL;
 						prev->block_size += sizeof(t_block) + cur_block->tale + cur_block->block_size;
 						cur_block = prev;
+					}
+					if (cur_block->next && cur_block->next->is_free) {
+						t_block* next = cur_block->next;
+						if (next->next)
+							cur_block->next = next->next;
+						else
+							cur_block->next = NULL;
+						cur_block->block_size += sizeof(t_block) + next->tale + next->block_size;
 					}
 					free_zone(cur_zone, SMALL_ZONE);
 					return ;

@@ -14,7 +14,8 @@ LIBFT_PATH	=	./libft/
 SRC		=	malloc.c \
 			utils.c \
 			show_alloc_mem.c \
-			free.c
+			free.c \
+			realloc.c
 
 SRCS	=	$(addprefix $(SRC_PATH), $(SRC))
 

@@ -1,56 +1,5 @@
 #include "../inc/malloc.h"
 
-// #ifdef DEBUG
-// 	#include <dlfcn.h>
-// 	static void* (*real_malloc)(size_t) = NULL;
-// 	static void (*real_free)(void*) = NULL;
-// 	static void* (*real_realloc)(void*, size_t) = NULL;
-// 	static int use_custom_malloc = 1; // менять через break poin   0 - используются системные функции, 1- твои
-// #endif
-
-// __attribute__((constructor))
-// void init()
-// {
-// 	#ifdef DEBUG
-// 		real_malloc = dlsym(((void *) - 1l), "malloc"); // set variable use_custom_malloc = 1 in WATCH
-// 		real_free = dlsym(((void *) - 1l), "free");
-// 		real_realloc = dlsym(((void *) - 1l), "realloc");
-// 		if (!use_custom_malloc)
-// 			return;
-// 	#endif
-// }
-
-// void *malloc(size_t size) {
-// 	#ifdef DEBUG
-// 		if (!use_custom_malloc) {
-// 			void* result = real_malloc(size);
-// 			return result;
-// 		}
-// 	#endif
-// }
-
-// void free(void * ptr) {
-// 	#ifdef DEBUG
-// 		if (!use_custom_malloc) {
-// 			real_free(ptr);
-// 			return;
-// 		}
-// 	#endif
-// 	if (!ptr) {
-// 		return;
-// 	}
-// }
-
-// void *realloc(void * ptr, size_t size) {
-// 	#ifdef DEBUG
-// 		if (!use_custom_malloc) {
-// 		void* result = real_realloc(ptr, size);
-// 			return result;
-// 		}
-// 	#endif
-// }
-
-
 t_allocator g_allocator = {
 	.tiny = NULL,
 	.small = NULL,
@@ -77,9 +26,11 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 				if (cur_diff < diff) { //check the difference if its lower we need to allockate in this block
 					diff = cur_diff; 
 					new_block = cur_block;
+					cur_block->is_free = 0;
 					if (new_block->block_size - size > sizeof(t_block))
 						devide_blocks(new_block, size);
 				}
+				return (new_block);
 			}
 			if (cur_block->next == NULL) {
 				size_t rest_amount_mem = zone_end - end_of_block(cur_block);
@@ -127,7 +78,6 @@ void* tiny_malloc(size_t size) {
 			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 			new_block->tale = new_block->user_mem_addr - (uintptr_t)new_block - sizeof(t_block); //needed for control during developing, can be deleted
-			new_zone->count = 1;
 			new_zone->next = NULL;
 			new_zone->blocks = new_block;
 			new_block->block_size = size;
@@ -161,7 +111,6 @@ void	*small_malloc(size_t size) {
 			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 			new_block->tale = new_block->user_mem_addr - (uintptr_t)new_block - sizeof(t_block); //needed for control during developing, can be deleted
-			new_zone->count = 1;
 			new_zone->next = NULL;
 			new_zone->blocks = new_block;
 			new_block->block_size = size;
@@ -213,9 +162,9 @@ void	*malloc(size_t size) {
 	else if (TINY < size && size <= SMALL)
 		return (small_malloc(size));
 	// else
-	// long int block_size =  sizeof(t_block);
-	// long int zone_size =  sizeof(t_zone);
-	// printf("sizeof t_block = %zu\n", block_size);
-	// printf("sizeof t_zone = %zu\n", zone_size);
+	long int block_size =  sizeof(t_block);
+	long int zone_size =  sizeof(t_zone);
+	printf("sizeof t_block = %zu\n", block_size);
+	printf("sizeof t_zone = %zu\n", zone_size);
 	return (large_malloc(size));
 }

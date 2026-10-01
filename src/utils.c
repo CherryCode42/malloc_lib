@@ -29,19 +29,32 @@ uintptr_t end_of_block(t_block* block) {
 
 //ToDO: this function needs to be tested after writing free function!!!!!!!!!!!!!!!!!!!
 void	devide_blocks(t_block* block, size_t size) { 
-	t_block* new_block;
 	uintptr_t temp_user_mem_addr;
+	uintptr_t user_mem_addr;
+	size_t rest_size;
 
-	new_block = block + size - 1;
-	new_block->next = block->next;
-	new_block->prev = block;
-	temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
-	new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1); 
-	if (new_block->user_mem_addr >= (uintptr_t)(block->next)) // need to check if after alingment we still have place, if not do nothing and return
-		return;
-	block->next = new_block;
-	new_block->block_size = (uintptr_t)new_block->next - new_block->user_mem_addr - 1;
-	new_block->is_free = 1;
+
+	rest_size = block->block_size - size;
+	if (rest_size > sizeof(t_block)) {
+		temp_user_mem_addr = block->user_mem_addr + size + sizeof(t_block);
+		user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+		if (user_mem_addr >= (uintptr_t)(block->next)) // need to check if after alingment we still have place, if not do nothing and return
+			return;
+		block->block_size = size;
+		t_block* new_block = (void*)block->user_mem_addr + size;
+		t_block* temp;
+		temp = block->next;
+		block->next = new_block;
+		new_block->prev = block;
+		if (temp)
+			new_block->next = temp;
+		else
+			new_block->next = NULL;
+		new_block->user_mem_addr = user_mem_addr;
+		new_block->is_free = 1;
+		new_block->tale = new_block->user_mem_addr - (uintptr_t)new_block - sizeof(t_block);
+		new_block->block_size = rest_size - sizeof(t_block) - new_block->tale;
+	}
 }
 
 int	zone_is_free(t_zone* zone) {

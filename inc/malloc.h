@@ -31,7 +31,6 @@ typedef struct s_block {
 } t_block;
 
 typedef struct s_zone {
-	int count;
 	size_t zone_size;
 	t_block* blocks;
 	struct s_zone *next;

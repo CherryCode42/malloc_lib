@@ -58,23 +58,25 @@ void test_split()
 
 void test_coalesce()
 {
-	void* a = malloc(100);
-	void* b = malloc(100);
-	void* c = malloc(100);
+	void* a = malloc(50);
+	void* b = malloc(10);
+	void* c = malloc(10);
 
 	free(b);
 	free(a);
-	free(c);
+	// free(c);
 
-	void* d = malloc(300);
+	void* d = malloc(20);
 
-	if (!d)
+
+	if (d != a)
 	{
 		printf("❌ coalesce FAIL\n");
 		exit(1);
 	}
 
 	free(d);
+	free(c);
 
 	printf("✅ coalesce OK\n");
 }
@@ -161,8 +163,7 @@ void test_fragmentation()
 	printf("✅ fragmentation OK\n");
 }
 
-void test_big()
-{
+void test_big() {
 	void* a = malloc(300*1024*1024);
 	void* b = malloc(200*1024*1024);
 	free(a);
@@ -171,7 +172,8 @@ void test_big()
 
 	if (a != c)
 	{
-		printf("❌ big FAIL\n");
+		printf("❌ big FAIL ");
+		printf("Comment: there is checked the situation when zones are saved when, but I'm doing mman fore each large allocation and delete zone if it was freed.\n");
 		exit(1);
 	}
 
@@ -183,7 +185,7 @@ void test_big()
 
 int main()
 {
-	printf("==== MALLOC TEST START ====\n");
+//	printf("==== MALLOC TEST START ====\n");
 
 	test_alignment();
 	test_basic();
