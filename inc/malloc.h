@@ -11,8 +11,6 @@
 #include <stdbool.h>
 #include <sys/mman.h>
 
-#define DEBUG 1
-
 #define ALIGNMENT 16
 
 #define TINY 128

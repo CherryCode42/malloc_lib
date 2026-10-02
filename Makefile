@@ -1,15 +1,15 @@
 NAME	=	libft_malloc_$(HOSTTYPE).so
 LINK	=	libft_malloc.so
 MAKE	=	make
-LIBFT	=	$(LIBFT_PATH)libft.a
 
 CC	=	gcc
-CFLAGS	=	-g -Wall -Wextra -Werror -fPIC
+DEBUG ?= 0
+
+CFLAGS = -Wall -Wextra -Werror -fPIC -DDEBUG=$(DEBUG)
 
 SRC_PATH	=	./src/
 OBJ_PATH	=	./obj/
 INC_PATH	=	./inc/
-LIBFT_PATH	=	./libft/
 
 SRC		=	malloc.c \
 			utils.c \
@@ -26,10 +26,10 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
-all: $(OBJ_PATH) $(LIBFT) $(NAME) $(LINK)
+all: $(OBJ_PATH) $(NAME) $(LINK)
 	
-$(NAME): $(OBJS) $(LIBFT)
-	$(CC) -shared -o $(NAME) $(OBJS) -L$(LIBFT_PATH) -lft
+$(NAME): $(OBJS)
+	$(CC) -shared -o $(NAME) $(OBJS)
 
 $(LINK): $(NAME)
 	ln -sf $(NAME) $(LINK)
@@ -38,22 +38,17 @@ $(OBJ_PATH):
 	mkdir -p $(OBJ_PATH)
 
 $(OBJ_PATH)%.o:	$(SRC_PATH)%.c
-	@$(CC) $(CFLAGS) -I$(INC_PATH) -I$(LIBFT_PATH) -c $< -o $@
-
-$(LIBFT):
-	$(MAKE) -C $(LIBFT_PATH)
+	@$(CC) $(CFLAGS) -I$(INC_PATH) -c $< -o $@
 
 test:
 	@cd tests && ./run_tests.sh
 
 clean:
 	@rm -f $(OBJS)
-	$(MAKE) -C $(LIBFT_PATH) clean
 
 fclean:	clean
 	@rm -rf $(OBJ_PATH)
 	@rm -f $(NAME) $(LINK)
-	$(MAKE) -C $(LIBFT_PATH) fclean
 
 re:	fclean	all
 

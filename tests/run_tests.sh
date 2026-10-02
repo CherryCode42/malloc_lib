@@ -20,11 +20,17 @@ done
 echo
 echo "=== Running tests ==="
 
-for test in test test0 test1 test2 test3 test4 test5 test_002; do
+        echo "================================"
+        echo "Running my test"
+        echo "================================"
+        ./test
+
+
+for test in test0 test1 test2 test3 test4 test5; do
     if [ -x "./$test" ]; then
         echo
         echo "================================"
-        echo "Running $test"
+        echo "Running school $test"
         echo "================================"
 
         "./$test"
@@ -40,3 +46,8 @@ for test in test test0 test1 test2 test3 test4 test5 test_002; do
         echo "✅ $test PASSED"
     fi
 done
+
+        echo "================================"
+        echo "Running Konstantins test"
+        echo "================================"
+        ./test_002

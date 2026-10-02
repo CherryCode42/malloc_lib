@@ -161,10 +161,5 @@ void	*malloc(size_t size) {
 		return (tiny_malloc(size));
 	else if (TINY < size && size <= SMALL)
 		return (small_malloc(size));
-	// else
-	long int block_size =  sizeof(t_block);
-	long int zone_size =  sizeof(t_zone);
-	printf("sizeof t_block = %zu\n", block_size);
-	printf("sizeof t_zone = %zu\n", zone_size);
 	return (large_malloc(size));
 }
