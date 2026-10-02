@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <sys/mman.h>

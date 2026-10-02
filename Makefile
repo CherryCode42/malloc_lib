@@ -43,6 +43,9 @@ $(OBJ_PATH)%.o:	$(SRC_PATH)%.c
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_PATH)
 
+test:
+	@cd tests && ./run_tests.sh
+
 clean:
 	@rm -f $(OBJS)
 	$(MAKE) -C $(LIBFT_PATH) clean

@@ -1,4 +1,4 @@
-# include "../include/malloc.h"
+#include "malloc.h"
 
 #define M (1024 * 1024)
 
@@ -20,9 +20,9 @@ int main()
     void* n = malloc(1024 * 32);
     void* o = malloc(M);
     void* p = malloc(16*M);
-    // void* q = malloc(128*M);
+    void* q = malloc(128*M);
 	void* qq = malloc(512*M); // 2000001F
-	void* q = malloc(128*M);
+	//void* q = malloc(128*M);
     show_alloc_mem(); 
     return (0); 
 }
