@@ -3,7 +3,10 @@
 t_allocator g_allocator = {
 	.tiny = NULL,
 	.small = NULL,
-	.large = NULL
+	.large = NULL,
+	.history = NULL,
+	.count_records = 0,
+	.start = 0,
 };
 
 t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size) {
@@ -86,6 +89,7 @@ void* tiny_malloc(size_t size) {
 			new_block->is_free = 0;
 	}
 	addr = (void*)new_block->user_mem_addr;
+	add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);
 }
 
@@ -121,6 +125,7 @@ void	*small_malloc(size_t size) {
 	new_block->user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 	addr = (void*)new_block->user_mem_addr;
+	add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);
 }
 
@@ -153,13 +158,26 @@ void	*large_malloc(size_t size) {
 	else
 		g_allocator.large = new_zone;
 	addr = (void*)new_block->user_mem_addr;
+	add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);
 }
 
-void	*malloc(size_t size) {
+void	*malloc_internal(size_t size) {
 	if (size <= TINY)
-		return (tiny_malloc(size));
-	else if (TINY < size && size <= SMALL)
-		return (small_malloc(size));
-	return (large_malloc(size));
+		return tiny_malloc(size);
+	else if (size <= SMALL)
+		return small_malloc(size);
+	else
+		return large_malloc(size);
+}
+
+void	*malloc(size_t size) {
+	void *ptr = NULL;
+
+	g_allocator.start = get_time_in_ms();
+	pthread_mutex_init(&g_allocator.g_malloc_mutex, NULL);
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
+	ptr = malloc_internal(size);
+	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
+	return (ptr);
 }

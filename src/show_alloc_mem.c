@@ -1,22 +1,10 @@
 #include "../inc/malloc.h"
 
-void putnbr_base(unsigned long n, int base)
-{
-	char *digits = "0123456789abcdef";
-
-	if (base < 2 || base > 16)
-		return;
-
-	if (n >= (unsigned long)base)
-		putnbr_base(n / base, base);
-
-	write(1, &digits[n % base], 1);
-}
-
 void show_alloc_mem() {
 	t_zone* cur_zone = NULL;
 	t_block* cur_block = NULL;
 
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
 	if (g_allocator.tiny != NULL) {
 		cur_zone = g_allocator.tiny;
 		while (cur_zone != NULL) {
@@ -86,4 +74,5 @@ void show_alloc_mem() {
 			cur_zone = cur_zone->next;
 		}
 	}
+	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
 }

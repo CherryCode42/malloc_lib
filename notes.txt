@@ -1,4 +1,4 @@
-gcc test.c -I./inc -L. -lft_malloc -o test - compile test with library
+gcc -DBONUS=0 test.c -I./inc -L. -lft_malloc -o test - compile test with library
 LD_LIBRARY_PATH=. ./test - start program with the library
 
 

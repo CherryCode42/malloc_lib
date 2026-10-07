@@ -68,3 +68,55 @@ int	zone_is_free(t_zone* zone) {
 	}
 	return (1);
 }
+
+//for printing
+void putnbr_base(unsigned long n, int base)
+{
+	char *digits = "0123456789abcdef";
+
+	if (base < 2 || base > 16)
+		return;
+
+	if (n >= (unsigned long)base)
+		putnbr_base(n / base, base);
+
+	write(1, &digits[n % base], 1);
+}
+
+void add_to_history(size_t bytes_nb, char* operation, void *addr, void *realloc_addr) { // for BONUS printing history
+	t_history* new_record;
+
+	if (g_allocator.history == NULL) {
+		void *ptr =	mmap(NULL, HISTORY_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); //for BONUS print history
+		if (ptr == MAP_FAILED)
+			return ;
+		g_allocator.history = (t_history*)ptr;
+		new_record = g_allocator.history;
+
+	}
+	if ((g_allocator.count_records + 1) * sizeof(t_history) > HISTORY_SIZE)
+		return;
+	new_record = &g_allocator.history[g_allocator.count_records];
+	new_record->addr = addr;
+	new_record->realloc_addr = realloc_addr;
+	new_record->operation = operation;
+	new_record->bytes_nb = bytes_nb;
+	new_record->time = time_dif(get_time_in_ms(), g_allocator.start);
+	g_allocator.count_records++;
+}
+
+time_t	get_time_in_ms(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+}
+
+time_t	time_dif(time_t now, time_t past)
+{
+	time_t	res;
+
+	res = now - past;
+	return (res);
+}

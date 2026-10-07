@@ -31,11 +31,13 @@ void free_zone(t_zone* zone, size_t zone_size) {
 	}
 }
 
-void	free(void *addr) {
+void	internal_free(void *addr) {
 	uintptr_t temp_addr;
 	t_zone* cur_zone = NULL;
 	t_block* cur_block = NULL;
+	size_t freed_size;
 
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
 	temp_addr = (uintptr_t)addr;
 	if (addr == NULL)
 		return ;
@@ -46,6 +48,7 @@ void	free(void *addr) {
 			while (cur_block != NULL) {
 				if (cur_block->user_mem_addr == temp_addr) {
 					cur_block->is_free = 1;
+					freed_size = cur_block->block_size;
 					if (cur_block->prev && cur_block->prev->is_free) {
 						t_block* prev = cur_block->prev;
 						if (cur_block->next) {
@@ -65,6 +68,7 @@ void	free(void *addr) {
 							cur_block->next = NULL;
 						cur_block->block_size += sizeof(t_block) + next->tale + next->block_size;
 					}
+					add_to_history(freed_size, "FREE", (void*)cur_block->user_mem_addr, NULL);
 					free_zone(cur_zone, TINY_ZONE);
 					return ;
 				}
@@ -80,6 +84,7 @@ void	free(void *addr) {
 			while (cur_block != NULL) {
 				if (cur_block->user_mem_addr == temp_addr) {
 					cur_block->is_free = 1;
+					freed_size = cur_block->block_size;
 					if (cur_block->prev && cur_block->prev->is_free) {
 						t_block* prev = cur_block->prev;
 						if (cur_block->next) {
@@ -99,6 +104,7 @@ void	free(void *addr) {
 							cur_block->next = NULL;
 						cur_block->block_size += sizeof(t_block) + next->tale + next->block_size;
 					}
+					add_to_history(freed_size, "FREE", (void*)cur_block->user_mem_addr, NULL);
 					free_zone(cur_zone, SMALL_ZONE);
 					return ;
 				}
@@ -125,10 +131,17 @@ void	free(void *addr) {
 						cur_zone->next->prev = NULL;
 					}
 				}
+				add_to_history(cur_zone->blocks->block_size, "FREE", (void*)cur_zone->blocks->user_mem_addr, NULL);
 				munmap(cur_zone, round_zone(round_metadata(sizeof(t_zone) + sizeof(t_block)) + cur_zone->blocks->block_size));
 				return ;
 			}
 			cur_zone = cur_zone->next;
 		}
 	}
+}
+
+void	free(void *addr) {
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
+	internal_free(addr);
+	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
 }
