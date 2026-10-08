@@ -7,6 +7,7 @@ t_allocator g_allocator = {
 	.history = NULL,
 	.count_records = 0,
 	.start = 0,
+	.g_malloc_mutex = PTHREAD_MUTEX_INITIALIZER,
 };
 
 t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size) {
@@ -162,7 +163,7 @@ void	*large_malloc(size_t size) {
 	return (addr);
 }
 
-void	*malloc_internal(size_t size) {
+void	*internal_malloc(size_t size) {
 	if (size <= TINY)
 		return tiny_malloc(size);
 	else if (size <= SMALL)
@@ -175,9 +176,8 @@ void	*malloc(size_t size) {
 	void *ptr = NULL;
 
 	g_allocator.start = get_time_in_ms();
-	pthread_mutex_init(&g_allocator.g_malloc_mutex, NULL);
 	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
-	ptr = malloc_internal(size);
+	ptr = internal_malloc(size);
 	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
 	return (ptr);
 }

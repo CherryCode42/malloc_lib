@@ -37,7 +37,6 @@ void	internal_free(void *addr) {
 	t_block* cur_block = NULL;
 	size_t freed_size;
 
-	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
 	temp_addr = (uintptr_t)addr;
 	if (addr == NULL)
 		return ;

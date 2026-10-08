@@ -23,7 +23,6 @@
 
 #define HISTORY_SIZE 409600
 
-
 typedef struct s_block {
 	size_t block_size;
 	size_t tale; //part wich is rest afer aligning user addr (needed when free block and unite with neighbours)

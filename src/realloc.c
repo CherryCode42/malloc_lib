@@ -97,4 +97,5 @@ void	*realloc(void * addr, size_t size) {
 	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
 	ptr = internal_realloc(addr, size);
 	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
+	return (ptr);
 }

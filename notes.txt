@@ -9,3 +9,7 @@ t_zone = 32 bytes
 TINY 128 bytes --> 128*100 + 48*100 + 32 = 12800 + 4800 + 32 = 17632 => mman needed 5 pages 5*4096=20480  20480 - 17632 = 2848 (extra bytes)
 
 SMALL 4096 bytes --> 4096*100 + 48*100 + 32 = 409600 + 4800 + 32 = 413632 => mman needed 102 page 102*4096 = 417792 - 413632 = 4160 (extra bytes)
+
+
+
+-g -Wall -Wextra -Werror philo.c philo_utils.c life_parse.c life_init.c routine_life_start.c routine.c time.c set_and_get.c synchronise.c check_philos.c clean_life.c -I./inc -L.. -lft_malloc
