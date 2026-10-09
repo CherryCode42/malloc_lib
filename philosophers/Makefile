@@ -15,7 +15,7 @@ LDFLAGS = -L.. -lft_malloc -pthread
 			$(CC) $(CFLAGS) -c $^ -o $@
 
 all:	$(OBJS)
-		$(CC) $(LDFLAGS) $^ -o $(NAME)
+		$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
 
 clean:
 		$(RM) $(OBJS) 
@@ -24,5 +24,8 @@ fclean:	clean
 		$(RM) $(NAME)
 
 re:		fclean all
+
+load:
+	LD_LIBRARY_PATH=.. ./philo 2 800 200 200 3
 
 .PHONY:	clean fclean re 

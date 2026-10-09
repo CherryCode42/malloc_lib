@@ -16,6 +16,7 @@ SRC		=	malloc.c \
 			show_alloc_mem.c \
 			free.c \
 			realloc.c \
+			calloc.c \
 			show_alloc_mem_ex.c
 
 SRCS	=	$(addprefix $(SRC_PATH), $(SRC))

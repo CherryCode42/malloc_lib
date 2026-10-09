@@ -22,7 +22,7 @@
 # include <stdbool.h>
 # include <limits.h>
 # include <errno.h>
-# include "../malloc.h"
+# include "../inc/malloc.h"
 
 typedef pthread_mutex_t	t_mut;
 

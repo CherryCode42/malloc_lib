@@ -39,7 +39,9 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 			if (cur_block->next == NULL) {
 				size_t rest_amount_mem = zone_end - end_of_block(cur_block);
 				if (rest_amount_mem > size + sizeof(t_block)) {	//if there is space after all occupied blocks in zone
-					new_block = (t_block*)((char*)cur_block + cur_block->block_size + sizeof(t_block));	//we can allocate new block there
+					new_block = (t_block*)((char*)cur_block
+							+ sizeof(t_block) + cur_block->block_size
+							+ cur_block->tale);	//we can allocate new block there
 					uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 					new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 					if (zone_end - new_block->user_mem_addr < size) //we need to check if it's enough memory for user with addr alingment
@@ -123,8 +125,6 @@ void	*small_malloc(size_t size) {
 			new_block->prev = NULL;
 			new_block->is_free = 0;
 	}
-	new_block->user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
-	new_block->user_mem_addr = (new_block->user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 	addr = (void*)new_block->user_mem_addr;
 	add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);

@@ -5,7 +5,7 @@
         "name": "C/C++: gcc build and debug current subproject",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${workspaceFolder}/a.out",
+        "program": "${workspaceFolder}/philo_debug.out",
         "args": ["2", "800", "200", "200", "3"],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}/philosophers/",
@@ -42,7 +42,7 @@
 //         "name": "C/C++: gcc build and debug current subproject",
 //         "type": "cppdbg",
 //         "request": "launch",
-//         "program": "${workspaceFolder}/thread_debug.out",
+//         "program": "${workspaceFolder}/test3_debug.out",
 //         "args": [],
 //         "stopAtEntry": false,
 //         "cwd": "${workspaceFolder}/",
@@ -67,7 +67,7 @@
 //                 "ignoreFailures": true
 //             }
 //         ],
-//         "preLaunchTask": "Thread Check",
+//         "preLaunchTask": "Test3 Check",
 //     }
 // ]
 // }

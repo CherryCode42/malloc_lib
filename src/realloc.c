@@ -27,21 +27,23 @@ void* internal_realloc(void *addr, size_t size) {
 			cur_block = cur_zone->blocks;
 			while (cur_block != NULL) {
 				if (cur_block->user_mem_addr == temp_addr) {
-					t_block* next = cur_block->next;
-					if (size <= TINY && (next->is_free && (next->block_size + next->tale + sizeof(t_block) <= size))) {
+					if (cur_block->next) {
+						t_block* next = cur_block->next;
+						if (size <= TINY && (next->is_free && (next->block_size + next->tale + sizeof(t_block) <= size))) {
 						//we don't need to move the data, just extend the existing block
 							extend_allocated_memory(next, cur_block, size);
 						addr = (void*)cur_block->user_mem_addr;
 						add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 						return (addr);
-					}
-					else {
-						addr = internal_malloc(size);
-						memcpy(addr, (void*)cur_block->user_mem_addr, cur_block->block_size);
-						add_to_history(size, "REALLOC", (void*)temp_addr, addr);
-						internal_free((void*)cur_block->user_mem_addr);
-						return (addr);
-					}
+						}
+						else {
+								addr = internal_malloc(size);
+								memcpy(addr, (void*)cur_block->user_mem_addr, cur_block->block_size);
+								add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+								internal_free((void*)cur_block->user_mem_addr);
+								return (addr);
+						}
+
 				}
 				cur_block = cur_block->next;
 			}
@@ -82,7 +84,7 @@ void* internal_realloc(void *addr, size_t size) {
 			if (temp_addr == cur_zone->blocks->user_mem_addr) {
 				memcpy(addr, (void*)cur_zone->blocks->user_mem_addr, cur_zone->blocks->block_size);
 				add_to_history(size, "REALLOC", (void*)temp_addr, addr);
-				free((void*)cur_zone->blocks->user_mem_addr);
+				internal_free((void*)cur_zone->blocks->user_mem_addr);
 				return (addr);
 			}
 			cur_zone = cur_zone->next;

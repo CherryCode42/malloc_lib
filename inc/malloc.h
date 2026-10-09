@@ -68,6 +68,8 @@ void	*small_malloc(size_t size);
 void	*large_malloc(size_t size);
 void	*internal_malloc(size_t zise);
 t_block	*lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size);
+void	*calloc(size_t nmemb, size_t size);
+
 
 //realloc
 void	*realloc(void *addr, size_t size);
