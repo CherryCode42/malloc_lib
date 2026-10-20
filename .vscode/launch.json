@@ -1,40 +1,3 @@
-{
-    "version": "0.2.0",
-    "configurations": [
-    {
-        "name": "C/C++: gcc build and debug current subproject",
-        "type": "cppdbg",
-        "request": "launch",
-        "program": "${workspaceFolder}/philo_debug.out",
-        "args": ["2", "800", "200", "200", "3"],
-        "stopAtEntry": false,
-        "cwd": "${workspaceFolder}/philosophers/",
-        "environment": [
-            {
-                "name": "LD_LIBRARY_PATH",
-                "value": "${workspaceFolder}"
-            }
-		],
-        "externalConsole": false,
-        "MIMode": "gdb",
-        "miDebuggerPath": "/usr/bin/gdb",
-        "setupCommands": [
-            {
-                "description": "Enable pretty-printing for gdb",
-                "text": "-enable-pretty-printing",
-                "ignoreFailures": true
-            },
-            {
-                "description": "Set Disassembly Flavor to Intel",
-                "text": "-gdb-set disassembly-flavor intel",
-                "ignoreFailures": true
-            }
-        ],
-        "preLaunchTask": "Build Project",
-    }
-]
-}
-
 // {
 //     "version": "0.2.0",
 //     "configurations": [
@@ -42,10 +5,10 @@
 //         "name": "C/C++: gcc build and debug current subproject",
 //         "type": "cppdbg",
 //         "request": "launch",
-//         "program": "${workspaceFolder}/test3_debug.out",
-//         "args": [],
+//         "program": "${workspaceFolder}/philo_debug.out",
+//         "args": ["2", "800", "200", "200", "3"],
 //         "stopAtEntry": false,
-//         "cwd": "${workspaceFolder}/",
+//         "cwd": "${workspaceFolder}/philosophers/",
 //         "environment": [
 //             {
 //                 "name": "LD_LIBRARY_PATH",
@@ -67,7 +30,44 @@
 //                 "ignoreFailures": true
 //             }
 //         ],
-//         "preLaunchTask": "Test3 Check",
+//         "preLaunchTask": "Build Project",
 //     }
 // ]
 // }
+
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "C/C++: gcc build and debug current subproject",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/test_002_debug.out",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}/",
+        "environment": [
+            {
+                "name": "LD_LIBRARY_PATH",
+                "value": "${workspaceFolder}"
+            }
+		],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Set Disassembly Flavor to Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ],
+        "preLaunchTask": "Test3 Check",
+    }
+]
+}

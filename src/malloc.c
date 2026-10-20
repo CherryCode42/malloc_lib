@@ -16,8 +16,16 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 	if (zone == NULL)
 		return (NULL);
 
+	size_t min_rest;
+	if (mode == TINY)
+		min_rest = 16; //min alligned capacity for 1
+	else
+		min_rest = 144; //min alligned capacity for 129
+
+	size_t requested_size = size;
+	size_t alligned_capacity = round_data(size);
 	t_block* cur_block = zone->blocks;
-	size_t diff = mode; //difference between needed size and free amount of bytes in block
+	size_t diff = mode; //difference between needed size and free amount of bytes in block, first equal mode (the biggest)
 	size_t cur_diff; //we need two of them to remember the lowest
 	uintptr_t zone_end; //last byte of zone
 
@@ -25,32 +33,32 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 		zone_end = (uintptr_t)cur_zone + zone_size - 1;
 		cur_block = cur_zone->blocks;
 		while (cur_block != NULL) {
-			if (cur_block->block_size >= size && cur_block->is_free) {
-				cur_diff = cur_block->block_size - size;
+			if (cur_block->block_size >= alligned_capacity && cur_block->is_free) {
+				cur_diff = cur_block->block_size - alligned_capacity;
 				if (cur_diff < diff) { //check the difference if its lower we need to allockate in this block
 					diff = cur_diff; 
 					new_block = cur_block;
+					new_block->user_size = requested_size;
 					cur_block->is_free = 0;
-					if (new_block->block_size - size > sizeof(t_block))
-						devide_blocks(new_block, size);
+					if (new_block->block_size - alligned_capacity > sizeof(t_block) + min_rest)
+						devide_blocks(new_block, alligned_capacity, requested_size);
 				}
 				return (new_block);
 			}
 			if (cur_block->next == NULL) {
 				size_t rest_amount_mem = zone_end - end_of_block(cur_block);
-				if (rest_amount_mem > size + sizeof(t_block)) {	//if there is space after all occupied blocks in zone
+				if (rest_amount_mem > alligned_capacity + sizeof(t_block)) {	//if there is space after all occupied blocks in zone
 					new_block = (t_block*)((char*)cur_block
-							+ sizeof(t_block) + cur_block->block_size
-							+ cur_block->tale);	//we can allocate new block there
+							+ sizeof(t_block) + cur_block->block_size);	//we can allocate new block there
 					uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 					new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
-					if (zone_end - new_block->user_mem_addr < size) //we need to check if it's enough memory for user with addr alingment
+					if (zone_end - new_block->user_mem_addr < alligned_capacity) //we need to check if it's enough memory for user with addr alingment
 						return (NULL);
 					cur_block->next = new_block;
 					new_block->next = NULL;
-					new_block->tale = new_block->user_mem_addr - (uintptr_t)new_block - sizeof(t_block); //needed for control during developing, can be deleted
 					new_block->prev = cur_block;
-					new_block->block_size = size;
+					new_block->user_size = requested_size;
+					new_block->block_size = alligned_capacity;
 					new_block->is_free = 0;
 					return (new_block);
 				}
@@ -83,10 +91,10 @@ void* tiny_malloc(size_t size) {
 			new_block = (t_block*)(current + sizeof(t_zone));
 			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
-			new_block->tale = new_block->user_mem_addr - (uintptr_t)new_block - sizeof(t_block); //needed for control during developing, can be deleted
 			new_zone->next = NULL;
 			new_zone->blocks = new_block;
-			new_block->block_size = size;
+			new_block->user_size = size;
+			new_block->block_size = round_data(size);
 			new_block->next = NULL;
 			new_block->prev = NULL;
 			new_block->is_free = 0;
@@ -117,10 +125,10 @@ void	*small_malloc(size_t size) {
 			new_block = (t_block*)(current + sizeof(t_zone));
 			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
-			new_block->tale = new_block->user_mem_addr - (uintptr_t)new_block - sizeof(t_block); //needed for control during developing, can be deleted
 			new_zone->next = NULL;
 			new_zone->blocks = new_block;
-			new_block->block_size = size;
+			new_block->user_size = size;
+			new_block->block_size = round_data(size);
 			new_block->next = NULL;
 			new_block->prev = NULL;
 			new_block->is_free = 0;
@@ -133,7 +141,7 @@ void	*small_malloc(size_t size) {
 void	*large_malloc(size_t size) {
 	void* addr;
 	size_t metadata_size = sizeof(t_zone) + sizeof(t_block);
-	metadata_size = round_metadata(metadata_size); //do metadata size divisible by 16 for the efficiency
+	metadata_size = round_data(metadata_size); //do metadata size divisible by 16 for the efficiency
 	size_t real_size = metadata_size + size;
 	real_size = round_zone(real_size);
 	void *ptr =	mmap(NULL, real_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -149,7 +157,8 @@ void	*large_malloc(size_t size) {
 	new_block->is_free = 0;
 	new_block->next = NULL;
 	new_block->prev = NULL;
-	new_block->block_size = size;
+	new_block->user_size = size;
+	new_block->block_size = round_data(size);
 	new_block->user_mem_addr = current + metadata_size;
 	if (g_allocator.large != NULL) {
 		t_zone * last_large_zone = find_last_zone(g_allocator.large);

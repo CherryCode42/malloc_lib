@@ -187,6 +187,7 @@ int main()
 {
 //	printf("==== MALLOC TEST START ====\n");
 
+	test_stress();
 	test_alignment();
 	test_basic();
 	test_split();
@@ -194,7 +195,6 @@ int main()
 	test_reuse();
 	test_edges();
 	test_fragmentation();
-	test_stress();
 	test_big();
 
 	printf("==== ALL TESTS PASSED ====\n");

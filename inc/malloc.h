@@ -25,12 +25,15 @@
 
 typedef struct s_block {
 	size_t block_size;
-	size_t tale; //part wich is rest afer aligning user addr (needed when free block and unite with neighbours)
+	size_t user_size;
 	bool is_free;
 	uintptr_t user_mem_addr;
 	struct s_block  *prev;
 	struct s_block *next;
 } t_block;
+
+_Static_assert(sizeof(t_block) % ALIGNMENT == 0,
+	"t_block size must be aligned to ALIGNMENT"); //to check for the furthe structure changing that t_block is alligned
 
 typedef struct s_zone {
 	size_t zone_size;
@@ -57,8 +60,6 @@ typedef struct s_allocator {
 	pthread_mutex_t g_malloc_mutex;
 } t_allocator;
 
-
-
 extern t_allocator g_allocator; //means: There is only one g_allocator in the whole program (it's in malloc.c)
 
 //malloc
@@ -74,7 +75,7 @@ void	*calloc(size_t nmemb, size_t size);
 //realloc
 void	*realloc(void *addr, size_t size);
 void	*internal_realloc(void *addr, size_t size);
-void	extend_allocated_memory(t_block *next, t_block *block, size_t size);
+void	extend_allocated_memory(t_block *next, t_block *block, size_t size, size_t rounded_size, size_t min_rest);
 
 //free
 void	free(void *addr);
@@ -83,10 +84,10 @@ void	free_zone(t_zone* zone, size_t zone_size);
 
 //utils
 uintptr_t	end_of_block(t_block* block);
-size_t	round_metadata(size_t metadata_size);
+size_t	round_data(size_t data_size);
 size_t	round_zone(size_t real_size);
 t_zone	*find_last_zone(t_zone *start);
-void	devide_blocks(t_block* block, size_t size);
+void	devide_blocks(t_block* block, size_t size, size_t user_size);
 int		zone_is_free(t_zone* zone);
 void	putnbr_base(unsigned long n, int base);
 
