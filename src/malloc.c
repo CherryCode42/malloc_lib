@@ -10,9 +10,78 @@ t_allocator g_allocator = {
 	.g_malloc_mutex = PTHREAD_MUTEX_INITIALIZER,
 };
 
-t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size) {
+t_block* finding_place_for_lockation(t_zone* zone, size_t size, size_t mode) {
+	t_block* lockation = NULL;
 	t_zone* cur_zone = zone;
+	if (zone == NULL)
+		return (NULL);
+	(void)mode;
+	size_t diff = SIZE_MAX; //difference between needed size and free amount of bytes in block
+	size_t cur_diff; //we need two of them to remember the lowest
 
+	size_t alligned_capacity = round_data(size);
+	t_block* cur_block = zone->blocks;
+	while (cur_zone!= NULL) {
+		cur_block = cur_zone->blocks;
+		while (cur_block != NULL) {
+			if (cur_block->is_free && cur_block->block_size >= alligned_capacity) {
+				cur_diff = cur_block->block_size - alligned_capacity;
+				if (cur_diff < diff) { //check the difference if its lower we need to allockate in this block
+					diff = cur_diff;
+					lockation = cur_block;
+				}
+			}
+			cur_block = cur_block->next;
+		}
+		cur_zone = cur_zone->next;
+	}
+	return (lockation);
+}
+
+t_block* lockate_at_end_of_zone(t_zone* zone, size_t alligned_capacity, size_t requested_size, size_t mode, size_t zone_size) {
+	size_t min_rest;
+	if (mode == TINY)
+		min_rest = 16; //min alligned capacity for 1
+	else
+		min_rest = 144; //min alligned capacity for 129
+
+	t_zone* cur_zone = zone;
+	t_block* cur_block;
+	uintptr_t zone_end; //last byte of zone
+	t_block* lockation = NULL;
+
+	while (cur_zone != NULL) {
+		cur_block = cur_zone->blocks;
+		zone_end = (uintptr_t)cur_zone + zone_size - 1;
+		while (cur_block->next != NULL)
+			cur_block = cur_block->next;
+		size_t rest_amount_mem = zone_end - end_of_block(cur_block);
+		if (rest_amount_mem >= alligned_capacity + sizeof(t_block)) {	//if there is space after all occupied blocks in zone
+			size_t available_capacity = rest_amount_mem - sizeof(t_block);
+			available_capacity &= ~(ALIGNMENT - 1);
+			if (available_capacity < alligned_capacity) {
+				cur_zone = cur_zone->next;
+				continue;
+			}
+			lockation = (t_block*)((char*)cur_block
+					+ sizeof(t_block) + cur_block->block_size);	//we can allocate new block there
+			cur_block->next = lockation;
+			lockation->prev = cur_block;
+			lockation->next = NULL;
+			lockation->user_size = requested_size;
+			lockation->block_size = available_capacity;
+			lockation->is_free = 0;
+			lockation->user_mem_addr = (uintptr_t)lockation + sizeof(t_block);
+			if (available_capacity - alligned_capacity > sizeof(t_block) + min_rest)
+				devide_blocks(lockation, alligned_capacity, requested_size);
+			return (lockation);
+		}
+		cur_zone = cur_zone->next;
+	}
+	return (lockation);
+}
+
+t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size) {
 	if (zone == NULL)
 		return (NULL);
 
@@ -24,51 +93,26 @@ t_block* lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t 
 
 	size_t requested_size = size;
 	size_t alligned_capacity = round_data(size);
-	t_block* cur_block = zone->blocks;
-	size_t diff = mode; //difference between needed size and free amount of bytes in block, first equal mode (the biggest)
-	size_t cur_diff; //we need two of them to remember the lowest
-	uintptr_t zone_end; //last byte of zone
+	t_block* lockation = NULL;
 
-	while (cur_zone!= NULL) {
-		zone_end = (uintptr_t)cur_zone + zone_size - 1;
-		cur_block = cur_zone->blocks;
-		while (cur_block != NULL) {
-			if (cur_block->block_size >= alligned_capacity && cur_block->is_free) {
-				cur_diff = cur_block->block_size - alligned_capacity;
-				if (cur_diff < diff) { //check the difference if its lower we need to allockate in this block
-					diff = cur_diff; 
-					new_block = cur_block;
-					new_block->user_size = requested_size;
-					cur_block->is_free = 0;
-					if (new_block->block_size - alligned_capacity > sizeof(t_block) + min_rest)
-						devide_blocks(new_block, alligned_capacity, requested_size);
-				}
-				return (new_block);
-			}
-			if (cur_block->next == NULL) {
-				size_t rest_amount_mem = zone_end - end_of_block(cur_block);
-				if (rest_amount_mem > alligned_capacity + sizeof(t_block)) {	//if there is space after all occupied blocks in zone
-					new_block = (t_block*)((char*)cur_block
-							+ sizeof(t_block) + cur_block->block_size);	//we can allocate new block there
-					uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
-					new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
-					if (zone_end - new_block->user_mem_addr < alligned_capacity) //we need to check if it's enough memory for user with addr alingment
-						return (NULL);
-					cur_block->next = new_block;
-					new_block->next = NULL;
-					new_block->prev = cur_block;
-					new_block->user_size = requested_size;
-					new_block->block_size = alligned_capacity;
-					new_block->is_free = 0;
-					return (new_block);
-				}
-			}
-			cur_block = cur_block->next;
-		}
-		cur_zone = cur_zone->next;
+	lockation = finding_place_for_lockation(zone, alligned_capacity, mode);
+	if (lockation) {
+		new_block = lockation;
+		new_block->user_size = requested_size;
+		new_block->is_free = 0;
+		if (new_block->block_size - alligned_capacity > sizeof(t_block) + min_rest)
+			devide_blocks(new_block, alligned_capacity, requested_size);
+		return (new_block);
 	}
-	return (new_block);
+	else {
+		lockation = lockate_at_end_of_zone(zone, alligned_capacity, requested_size, mode, zone_size);
+		if (!lockation)
+			return (new_block);
+		new_block = lockation;
+		return (new_block);
+	}
 }
+
 
 void* tiny_malloc(size_t size) {
 	void* addr;

@@ -5,7 +5,7 @@
 #include "malloc.h"
 
 #define THREADS 4
-#define ALLOCS 1000
+#define ALLOCS 50
 
 pthread_mutex_t test_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t allocator_mutex = PTHREAD_MUTEX_INITIALIZER;

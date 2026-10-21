@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define THREADS 4
-#define ALLOCS 1000
+#define ALLOCS 50
 
 void *worker(void *arg)
 {

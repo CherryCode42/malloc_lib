@@ -29,11 +29,14 @@ uintptr_t end_of_block(t_block* block) {
 
 //ToDO: this function needs to be tested after writing free function!!!!!!!!!!!!!!!!!!!
 void	devide_blocks(t_block* block, size_t size, size_t user_size) { 
-	// uintptr_t temp_user_mem_addr;
 	uintptr_t user_mem_addr;
 	size_t rest_size;
 
+	if (block == NULL || size == 0 || size > block->block_size)
+		return ;
 	rest_size = block->block_size - size;
+	if (rest_size < sizeof(t_block) + ALIGNMENT)
+		return ;
 	user_mem_addr = block->user_mem_addr + size + sizeof(t_block);
 	block->block_size = size;
 	block->user_size = user_size;

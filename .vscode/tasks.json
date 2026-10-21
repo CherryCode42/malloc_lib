@@ -59,12 +59,12 @@
                 "-Wall",
                 "-Wextra",
                 "-Werror",
-                "/${workspaceFolder}/test_002.c",
+                "/${workspaceFolder}/test_realloc.c",
 				"-I./inc",
 				 "-L.",
 				 "-lft_malloc",
 				 "-o",
-				 "test_002_debug.out"
+				 "test_realloc_debug.out"
             ],
             // "options": {
             //     "cwd": "${workspaceFolder}",

@@ -42,7 +42,7 @@
         "name": "C/C++: gcc build and debug current subproject",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${workspaceFolder}/test_002_debug.out",
+        "program": "${workspaceFolder}/test_realloc_debug.out",
         "args": [],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}/",

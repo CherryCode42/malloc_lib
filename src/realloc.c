@@ -14,13 +14,20 @@ void	extend_allocated_memory(t_block *next, t_block *block, size_t size, size_t 
 	return ;
 }
 
-void* relocate_mem(size_t size, void* temp_addr, void* user_mem_addr, size_t block_size) {
+void* relocate_mem(size_t size, void* temp_addr, void* user_mem_addr, size_t old_user_size) {
 	void* new_addr = internal_malloc(size);
+	size_t size_to_copy;
+
 	if (!new_addr)
 		return (NULL);
-	memcpy(new_addr, user_mem_addr, block_size);
-	add_to_history(size, "REALLOC", temp_addr, new_addr);
+
+	if (size >= old_user_size)
+		size_to_copy = old_user_size;
+	else
+		size_to_copy = size;
+	memcpy(new_addr, user_mem_addr, size_to_copy);
 	internal_free(user_mem_addr);
+	add_to_history(size, "REALLOC", (void*)temp_addr, user_mem_addr);
 	return (new_addr);
 }
 
@@ -48,6 +55,7 @@ void* internal_realloc(void *addr, size_t size) {
 							devide_blocks(cur_block, rounded_size, size);
 						else
 							cur_block->user_size = size;
+						add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 						return (addr);
 					}
 					if (cur_block->next) {
@@ -65,6 +73,7 @@ void* internal_realloc(void *addr, size_t size) {
 					else {
 						if (cur_block->block_size <= rounded_size) {
 							cur_block->user_size = size;
+							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 							return (addr);
 						}
 						else // we move the data
@@ -88,6 +97,7 @@ void* internal_realloc(void *addr, size_t size) {
 							devide_blocks(cur_block, rounded_size, size);
 						else
 							cur_block->user_size = size;
+						add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 						return (addr);
 					}
 					if (cur_block->next) {
@@ -105,6 +115,7 @@ void* internal_realloc(void *addr, size_t size) {
 					else {
 						if (cur_block->block_size <= rounded_size) {
 							cur_block->user_size = size;
+							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 							return (addr);
 						}
 						else // we move the data
@@ -118,22 +129,13 @@ void* internal_realloc(void *addr, size_t size) {
 	}
 	if (g_allocator.large != NULL) {
 		cur_zone = g_allocator.large;
-		void *new_addr;
 		while (cur_zone != NULL) {
-			if (temp_addr == cur_zone->blocks->user_mem_addr) {
-				new_addr = internal_malloc(size);
-				if (!new_addr)
-					return(NULL);
-				memcpy(new_addr, (void*)cur_zone->blocks->user_mem_addr, cur_zone->blocks->block_size);
-				add_to_history(size, "REALLOC", (void*)temp_addr, new_addr);
-				internal_free((void*)cur_zone->blocks->user_mem_addr);
-				return (new_addr);
-			}
+			if (temp_addr == cur_zone->blocks->user_mem_addr)
+				return(relocate_mem(size, (void*)temp_addr, (void*)cur_zone->blocks->user_mem_addr, cur_zone->blocks->user_size));
 			cur_zone = cur_zone->next;
 		}
 		if (cur_zone == NULL)
-			new_addr = NULL;
-		addr = new_addr;
+			addr = NULL;
 	}
 	return (addr);
 }
