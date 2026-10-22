@@ -136,6 +136,7 @@ void* tiny_malloc(size_t size) {
 			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 			new_zone->next = NULL;
+			new_zone->zone_size = TINY_ZONE;
 			new_zone->blocks = new_block;
 			new_block->user_size = size;
 			new_block->block_size = round_data(size);
@@ -170,6 +171,7 @@ void	*small_malloc(size_t size) {
 			uintptr_t temp_user_mem_addr = (uintptr_t)new_block + sizeof(t_block);
 			new_block->user_mem_addr = (temp_user_mem_addr + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 			new_zone->next = NULL;
+			new_zone->zone_size = SMALL_ZONE;
 			new_zone->blocks = new_block;
 			new_block->user_size = size;
 			new_block->block_size = round_data(size);
@@ -226,11 +228,19 @@ void	*internal_malloc(size_t size) {
 }
 
 void	*malloc(size_t size) {
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
+	ensure_debug_config();
+	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
+
 	void *ptr = NULL;
 
 	g_allocator.start = get_time_in_ms();
 	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
 	ptr = internal_malloc(size);
+	if (g_debug_cfg.debug && g_debug_cfg.check_level > 0)
+		validate_heap();
+	if (g_debug_cfg.debug && g_debug_cfg.log_enabled == 1)
+		print_malloc_log(ptr, size);
 	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
 	return (ptr);
 }

@@ -141,6 +141,10 @@ void* internal_realloc(void *addr, size_t size) {
 }
 
 void	*realloc(void * addr, size_t size) {
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
+	ensure_debug_config();
+	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
+
 	void *ptr = NULL;
 
 	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
@@ -156,6 +160,10 @@ void	*realloc(void * addr, size_t size) {
 		return (ptr);
 	}
 	ptr = internal_realloc(addr, size);
+	if (g_debug_cfg.debug && g_debug_cfg.check_level > 0)
+		validate_heap();
+	if (g_debug_cfg.debug && g_debug_cfg.log_enabled == 1)
+		print_realloc_log(ptr, size);
 	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
 	return (ptr);
 }

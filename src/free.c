@@ -133,6 +133,8 @@ void	internal_free(void *addr) {
 						g_allocator.large = cur_zone->next;
 						cur_zone->next->prev = NULL;
 					}
+					else
+						g_allocator.large = NULL;
 				}
 				add_to_history(cur_zone->blocks->user_size, "FREE", (void*)cur_zone->blocks->user_mem_addr, NULL);
 				munmap(cur_zone, round_zone(round_data(sizeof(t_zone) + sizeof(t_block)) + cur_zone->blocks->block_size));
@@ -145,6 +147,14 @@ void	internal_free(void *addr) {
 
 void	free(void *addr) {
 	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
+	ensure_debug_config();
+	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
+
+	pthread_mutex_lock(&g_allocator.g_malloc_mutex);
 	internal_free(addr);
+	if (g_debug_cfg.debug && g_debug_cfg.check_level > 0)
+		validate_heap();
+	if (g_debug_cfg.debug && g_debug_cfg.log_enabled == 1)
+		print_free_log(addr);
 	pthread_mutex_unlock(&g_allocator.g_malloc_mutex);
 }
