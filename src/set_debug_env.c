@@ -3,7 +3,6 @@
 t_debug_cfg g_debug_cfg = {
     .debug = 0,
     .check_level = 0,
-    .perturb_byte = 0,
     .log_enabled = 0
 };
 
@@ -30,12 +29,6 @@ void init_debug_config( )
 	if (env)
 		g_debug_cfg.check_level = atoi(env);
 
-	env = getenv("MALLOC_PERTURB");
-	if (env) {
-		long v = strtol(env, NULL, 0);
-		if (v >= 0 && v <= 255)
-			g_debug_cfg.perturb_byte = (unsigned char)v;
-	}
 	env = getenv("MALLOC_LOG");
 	if (env)
 		g_debug_cfg.log_enabled = atoi(env);

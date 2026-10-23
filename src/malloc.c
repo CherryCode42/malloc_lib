@@ -120,8 +120,11 @@ void* tiny_malloc(size_t size) {
 	new_block = lockate_new_data(new_block, g_allocator.tiny, size, TINY, TINY_ZONE);
 	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
 			void *ptr =	mmap(NULL, TINY_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			if (ptr == MAP_FAILED)
+			if (ptr == MAP_FAILED){
+				if (g_debug_cfg.debug)
+					write (2, "[DEBUG] mmap() failed allocation\n", 33);
 				return (NULL);
+			}
 			char *current = (char *)ptr;
 			t_zone* new_zone = (t_zone*)current;
 			if (g_allocator.tiny == NULL)
@@ -155,8 +158,11 @@ void	*small_malloc(size_t size) {
 	new_block = lockate_new_data(new_block, g_allocator.small, size, SMALL, SMALL_ZONE);
 	if (!new_block) { //if we couldn't find any place for the new block in existed zones wee need a new one
 		void *ptr =	mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			if (ptr == MAP_FAILED)
+			if (ptr == MAP_FAILED) {
+				if (g_debug_cfg.debug)
+					write (2, "[DEBUG] mmap() failed allocation\n", 33);
 				return (NULL);
+			}
 			char *current = (char *)ptr;
 			t_zone* new_zone = (t_zone*)current;
 			if (g_allocator.small == NULL)
@@ -191,8 +197,11 @@ void	*large_malloc(size_t size) {
 	size_t real_size = metadata_size + size;
 	real_size = round_zone(real_size);
 	void *ptr =	mmap(NULL, real_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (ptr == MAP_FAILED)
+	if (ptr == MAP_FAILED) {
+		if (g_debug_cfg.debug)
+			write (2, "[DEBUG] mmap() failed allocation\n", 33);
 		return (NULL);
+	}
 	uintptr_t current = (uintptr_t)ptr;
 	t_zone* new_zone = (t_zone*)current;
 	t_block* new_block = (t_block*)(current + sizeof(t_zone));
