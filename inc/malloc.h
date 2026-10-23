@@ -12,6 +12,7 @@
 #include <sys/mman.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <fcntl.h>
 
 #define ALIGNMENT 16
 
@@ -71,6 +72,14 @@ void	*internal_malloc(size_t zise);
 t_block	*lockate_new_data(t_block* new_block, t_zone* zone, size_t size, size_t mode, size_t zone_size);
 void	*calloc(size_t nmemb, size_t size);
 
+//for debug environment
+typedef struct s_debug_cfg {
+    int debug;
+    int check_level;
+    int log_enabled;
+} t_debug_cfg;
+
+extern t_debug_cfg g_debug_cfg;
 
 //realloc
 void	*realloc(void *addr, size_t size);
@@ -89,15 +98,23 @@ size_t	round_zone(size_t real_size);
 t_zone	*find_last_zone(t_zone *start);
 void	devide_blocks(t_block* block, size_t size, size_t user_size);
 int		zone_is_free(t_zone* zone);
-void	putnbr_base(unsigned long n, int base);
+void	putnbr_base(unsigned long n, int base, int fd);
 
 //utis for bonus
 void	add_to_history(size_t bytes_nb, char* operation, void *addr, void *realloc_addr);
 time_t	get_time_in_ms(void);
 time_t	time_dif(time_t now, time_t past);
+int		validate_heap();
+void print_malloc_log(void* ptr, size_t size);
+void print_free_log(void* ptr);
+void print_realloc_log(void* ptr, size_t size);
 
 //printing memory
 void	show_alloc_mem();
 void	show_alloc_mem_ex();
+
+//debug_env
+void ensure_debug_config( );
+void init_debug_config( );
 
 #endif

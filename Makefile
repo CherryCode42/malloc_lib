@@ -16,7 +16,9 @@ SRC		=	malloc.c \
 			show_alloc_mem.c \
 			free.c \
 			realloc.c \
-			show_alloc_mem_ex.c
+			show_alloc_mem_ex.c \
+			utils_bonuses.c \
+			set_debug_env.c
 
 SRCS	=	$(addprefix $(SRC_PATH), $(SRC))
 
