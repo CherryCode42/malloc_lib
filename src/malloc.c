@@ -148,7 +148,8 @@ void* tiny_malloc(size_t size) {
 			new_block->is_free = 0;
 	}
 	addr = (void*)new_block->user_mem_addr;
-	add_to_history(size, "MALLOC", addr, NULL);
+	if (BONUS)
+		add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);
 }
 
@@ -186,7 +187,8 @@ void	*small_malloc(size_t size) {
 			new_block->is_free = 0;
 	}
 	addr = (void*)new_block->user_mem_addr;
-	add_to_history(size, "MALLOC", addr, NULL);
+	if (BONUS)
+		add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);
 }
 
@@ -223,7 +225,8 @@ void	*large_malloc(size_t size) {
 	else
 		g_allocator.large = new_zone;
 	addr = (void*)new_block->user_mem_addr;
-	add_to_history(size, "MALLOC", addr, NULL);
+	if (BONUS)
+		add_to_history(size, "MALLOC", addr, NULL);
 	return (addr);
 }
 

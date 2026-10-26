@@ -4,9 +4,9 @@ MAKE	=	make
 
 CC	=	gcc
 DEBUG ?= 0
+BONUS ?= 0
 
-CFLAGS = -Wall -Wextra -Werror -fPIC -DDEBUG=$(DEBUG)
-
+CFLAGS = -Wall -Wextra -Werror -fPIC -DDEBUG=$(DEBUG) -DBONUS=$(BONUS)
 SRC_PATH	=	./src/
 OBJ_PATH	=	./obj/
 INC_PATH	=	./inc/

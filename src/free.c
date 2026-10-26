@@ -69,8 +69,9 @@ void	internal_free(void *addr) {
 							cur_block->next = NULL;
 						cur_block->block_size += sizeof(t_block) + next->block_size;
 					}
-					add_to_history(freed_size, "FREE", (void*)cur_block->user_mem_addr, NULL);
-					free_zone(cur_zone, TINY_ZONE);
+					if (BONUS)
+						add_to_history(freed_size, "FREE", (void*)cur_block->user_mem_addr, NULL);
+					//free_zone(cur_zone, TINY_ZONE);
 					return ;
 				}
 				cur_block = cur_block->next;
@@ -107,8 +108,9 @@ void	internal_free(void *addr) {
 							cur_block->next = NULL;
 						cur_block->block_size += sizeof(t_block) + next->block_size;
 					}
-					add_to_history(freed_size, "FREE", (void*)cur_block->user_mem_addr, NULL);
-					free_zone(cur_zone, SMALL_ZONE);
+					if (BONUS)
+						add_to_history(freed_size, "FREE", (void*)cur_block->user_mem_addr, NULL);
+					//free_zone(cur_zone, SMALL_ZONE);
 					return ;
 				}
 				cur_block = cur_block->next;
@@ -136,8 +138,10 @@ void	internal_free(void *addr) {
 					else
 						g_allocator.large = NULL;
 				}
-				add_to_history(cur_zone->blocks->user_size, "FREE", (void*)cur_zone->blocks->user_mem_addr, NULL);
-				munmap(cur_zone, round_zone(round_data(sizeof(t_zone) + sizeof(t_block)) + cur_zone->blocks->block_size));
+				if (BONUS)
+					add_to_history(cur_zone->blocks->user_size, "FREE", (void*)cur_zone->blocks->user_mem_addr, NULL);
+				if (cur_zone->prev != NULL)
+					munmap(cur_zone, round_zone(round_data(sizeof(t_zone) + sizeof(t_block)) + cur_zone->blocks->block_size));
 				return ;
 			}
 			cur_zone = cur_zone->next;

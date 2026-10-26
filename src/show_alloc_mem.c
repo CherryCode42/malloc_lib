@@ -20,7 +20,7 @@ void show_alloc_mem() {
 					write(1, "0x", 2);
 					putnbr_base((unsigned long)cur_block->user_mem_addr + cur_block->user_size, 16, 1);
 					write(1, " : ", 3);
-					putnbr_base(cur_block->block_size, 10, 1);
+					putnbr_base(cur_block->user_size, 10, 1);
 					write (1, " bytes\n", 7);
 				}
 				cur_block = cur_block->next;
@@ -43,7 +43,7 @@ void show_alloc_mem() {
 					write(1, "0x", 2);
 					putnbr_base((unsigned long)cur_block->user_mem_addr + cur_block->user_size, 16, 1);
 					write(1, " : ", 3);
-					putnbr_base(cur_block->block_size, 10, 1);
+					putnbr_base(cur_block->user_size, 10, 1);
 					write (1, " bytes\n", 7);
 				}
 				cur_block = cur_block->next;
@@ -63,7 +63,7 @@ void show_alloc_mem() {
 			write(1, "0x", 2);
 			putnbr_base((unsigned long)cur_zone->blocks->user_mem_addr + cur_zone->blocks->user_size, 16, 1);
 			write(1, " : ", 3);
-			putnbr_base(cur_zone->blocks->block_size, 10, 1);
+			putnbr_base(cur_zone->blocks->user_size, 10, 1);
 			write (1, " bytes\n", 7);
 			cur_zone = cur_zone->next;
 		}

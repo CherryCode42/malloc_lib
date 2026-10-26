@@ -4,23 +4,25 @@
 void add_to_history(size_t bytes_nb, char* operation, void *addr, void *realloc_addr) { // for BONUS printing history
 	t_history* new_record;
 
-	if (g_allocator.history == NULL) {
-		void *ptr =	mmap(NULL, HISTORY_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); //for BONUS print history
-		if (ptr == MAP_FAILED)
-			return ;
-		g_allocator.history = (t_history*)ptr;
-		new_record = g_allocator.history;
+	if (BONUS) {
+		if (g_allocator.history == NULL) {
+			void *ptr =	mmap(NULL, HISTORY_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); //for BONUS print history
+			if (ptr == MAP_FAILED)
+				return ;
+			g_allocator.history = (t_history*)ptr;
+			new_record = g_allocator.history;
 
+		}
+		if ((g_allocator.count_records + 1) * sizeof(t_history) > HISTORY_SIZE)
+			return ;
+		new_record = &g_allocator.history[g_allocator.count_records];
+		new_record->addr = addr;
+		new_record->realloc_addr = realloc_addr;
+		new_record->operation = operation;
+		new_record->bytes_nb = bytes_nb;
+		new_record->time = time_dif(get_time_in_ms(), g_allocator.start);
+		g_allocator.count_records++;
 	}
-	if ((g_allocator.count_records + 1) * sizeof(t_history) > HISTORY_SIZE)
-		return ;
-	new_record = &g_allocator.history[g_allocator.count_records];
-	new_record->addr = addr;
-	new_record->realloc_addr = realloc_addr;
-	new_record->operation = operation;
-	new_record->bytes_nb = bytes_nb;
-	new_record->time = time_dif(get_time_in_ms(), g_allocator.start);
-	g_allocator.count_records++;
 }
 
 time_t	get_time_in_ms(void)

@@ -27,7 +27,8 @@ void* relocate_mem(size_t size, void* temp_addr, void* user_mem_addr, size_t old
 		size_to_copy = size;
 	memcpy(new_addr, user_mem_addr, size_to_copy);
 	internal_free(user_mem_addr);
-	add_to_history(size, "REALLOC", (void*)temp_addr, user_mem_addr);
+	if (BONUS)
+		add_to_history(size, "REALLOC", (void*)temp_addr, user_mem_addr);
 	return (new_addr);
 }
 
@@ -50,12 +51,17 @@ void* internal_realloc(void *addr, size_t size) {
 			cur_block = cur_zone->blocks;
 			while (cur_block != NULL) {
 				if (cur_block->user_mem_addr == temp_addr) {
+					if (size > TINY)
+						return (relocate_mem(size, (void*)temp_addr,
+							(void*)cur_block->user_mem_addr,
+							cur_block->user_size));
 					if (cur_block->block_size >= rounded_size) {
 						if (cur_block->block_size > rounded_size + sizeof(t_block) + min_rest)
 							devide_blocks(cur_block, rounded_size, size);
 						else
 							cur_block->user_size = size;
-						add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+						if (BONUS)
+							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 						return (addr);
 					}
 					if (cur_block->next) {
@@ -64,7 +70,8 @@ void* internal_realloc(void *addr, size_t size) {
 						//we don't need to move the data, just extend the existing block
 							extend_allocated_memory(next, cur_block, size, rounded_size, min_rest);
 							addr = (void*)cur_block->user_mem_addr;
-							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+							if (BONUS)
+								add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 							return (addr);
 						}
 						else // we move the data
@@ -73,7 +80,8 @@ void* internal_realloc(void *addr, size_t size) {
 					else {
 						if (cur_block->block_size <= rounded_size) {
 							cur_block->user_size = size;
-							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+							if (BONUS)
+								add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 							return (addr);
 						}
 						else // we move the data
@@ -92,12 +100,17 @@ void* internal_realloc(void *addr, size_t size) {
 			cur_block = cur_zone->blocks;
 			while (cur_block != NULL) {
 				if (cur_block->user_mem_addr == temp_addr) {
+					if (size > SMALL)
+						return (relocate_mem(size, (void*)temp_addr,
+							(void*)cur_block->user_mem_addr,
+							cur_block->user_size));
 					if (cur_block->block_size >= rounded_size) {
 						if (cur_block->block_size > rounded_size + sizeof(t_block) + min_rest)
 							devide_blocks(cur_block, rounded_size, size);
 						else
 							cur_block->user_size = size;
-						add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+						if (BONUS)
+							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 						return (addr);
 					}
 					if (cur_block->next) {
@@ -106,7 +119,8 @@ void* internal_realloc(void *addr, size_t size) {
 							//we don't need to move the data, just extend the existing block
 								extend_allocated_memory(next, cur_block, size, rounded_size, min_rest);
 							addr = (void*)cur_block->user_mem_addr;
-							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+							if (BONUS)
+								add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 							return (addr);
 						}
 						else
@@ -115,7 +129,8 @@ void* internal_realloc(void *addr, size_t size) {
 					else {
 						if (cur_block->block_size <= rounded_size) {
 							cur_block->user_size = size;
-							add_to_history(size, "REALLOC", (void*)temp_addr, addr);
+							if (BONUS)
+								add_to_history(size, "REALLOC", (void*)temp_addr, addr);
 							return (addr);
 						}
 						else // we move the data

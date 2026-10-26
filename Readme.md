@@ -5,10 +5,14 @@ This project was done in order to deepen an understanding of Unix memory organiz
 
 **System calls was used:**  
 _void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);_  
+System call creates a new mapping in the virtual address space of the calling process.
 - **void \*addr** - is NULL, for the kernel to choose the (page-aligned) address at which to create the mapping
 - **size_t length** - amount of bytes needed
 - **int prot** - argument describes the desired memory protection of the mapping (PROT_EXEC  Pages may be executed. PROT_READ  Pages may be read. PROT_WRITE Pages may be written. PROT_NONE  Pages may not be accessed.)
-- **int flags** - determines whether updates to the mapping are visible to other processes mapping the same region, and whether updates are carried through to the underlying file. (**MAP_SHARED** and **MAP_PRIVATE** describe the disposition of write references to the memory object. If MAP_SHARED is specified, write references shall change the underlying object. If MAP_PRIVATE is specified, modifications to the mapped data by the calling process shall be visible only to the calling process and shall not change the underlying object. It is unspecified whether modifications to the underlying object done after the MAP_PRIVATE mapping is established are visible through the MAP_PRIVATE mapping. Either MAP_SHARED or MAP_PRIVATE can be specified, but not both. The mapping type is retained across fork(). **MAP_ANONYMOUS** The mapping is not backed by any file; its contents are initialized to zero. The fd argument is ignored; however, some  implementations require fd to be -1 if MAP_ANONYMOUS (or MAP_ANON) is specified, and portable applications should  ensure  this. The offset argument should be zero. The use of MAP_ANONYMOUS in conjunction with MAP_SHARED is supported on Linux only since kernel 2.4.)
+- **int flags** - determines whether updates to the mapping are visible to other processes mapping the same region, and whether updates are carried through to the underlying file. (**MAP_SHARED** and **MAP_PRIVATE** describe the disposition of write references to the memory object. If MAP_SHARED is specified, write references shall change the underlying object. If MAP_PRIVATE is specified, modifications to the mapped data by the calling process shall be visible only to the calling process and shall not change the underlying object. It is unspecified whether modifications to the underlying object done after the MAP_PRIVATE mapping is established are visible through the MAP_PRIVATE mapping. Either MAP_SHARED or MAP_PRIVATE can be specified, but not both. The mapping type is retained across fork(). **MAP_ANONYMOUS** The mapping is not backed by any file; its contents are initialized to zero. The fd argument is ignored; however, some  implementations require fd to be -1 if MAP_ANONYMOUS (or MAP_ANON) is specified, and portable applications should  ensure  this. The offset argument should be zero. The use of MAP_ANONYMOUS in conjunction with MAP_SHARED is supported on Linux only since kernel 2.4.)  
+
+_int munmap(void *addr, size_t length)_  
+System call deletes the mappings for the specified address range, and causes further references to addresses within the range to generate invalid memory references.
 
 ## **How my custom malloc works:**
 
@@ -36,6 +40,25 @@ the standard memory zones. It is handled by direct using mmap().
 - `validate_heap()` checks the allocator structure and helps detect corrupted metadata or invalid block states.
 - The allocator maintains operation history for debugging, making it easier to trace malloc, free, and realloc calls during testing.
 - Thread-safety is ensured with a global pthread mutex, so allocator operations such as malloc, free, realloc, and memory inspection are protected against concurrent access from multiple threads.
+
+## **Useful notes for proper work with library**
+To compile program with custom malloc library use
+```
+gcc -DBONUS=0 -DDEBUG=0 <program>.c -I./inc -L. -lft_malloc -o <program>
+```
+
+To start program with custom malloc library use
+```
+LD_LIBRARY_PATH=. ./<program>
+```
+
+To use debug features env variables should be exported
+```
+export MALLOC_DEBUG=1
+export MALLOC_CHECK=1
+export MALLOC_LOG=1
+```
+and -DDEBUG flad should be established equal 1 while compile the library
 
 ## **Used resourses:**
 
