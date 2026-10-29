@@ -35,7 +35,7 @@ the standard memory zones. It is handled by direct using mmap().
 ## **Additional features:**
 
 - `show_alloc_mem()` prints the currently allocated memory ranges grouped by size class.
-- `show_alloc_mem_ex()` prints the allocator event history with timestamps, operation type, and addresses for debugging.
+- `show_alloc_mem_ex(char *mode)` prints the allocator event history with timestamps, operation type, and addresses for debugging and hexadecimal dump of allocated memory. For the history you need to pass "History" as mode, and for the hexadecimal dump "DUMP".
 - Debug mode is supported through environment variables such as `MALLOC_DEBUG`, `MALLOC_CHECK`, and `MALLOC_LOG`, enabling runtime validation and logging.
 - `validate_heap()` checks the allocator structure and helps detect corrupted metadata or invalid block states.
 - The allocator maintains operation history for debugging, making it easier to trace malloc, free, and realloc calls during testing.
