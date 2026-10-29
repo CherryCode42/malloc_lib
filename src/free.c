@@ -140,8 +140,7 @@ void	internal_free(void *addr) {
 				}
 				if (BONUS)
 					add_to_history(cur_zone->blocks->user_size, "FREE", (void*)cur_zone->blocks->user_mem_addr, NULL);
-				if (cur_zone->prev != NULL)
-					munmap(cur_zone, round_zone(round_data(sizeof(t_zone) + sizeof(t_block)) + cur_zone->blocks->block_size));
+				munmap(cur_zone, cur_zone->zone_size);
 				return ;
 			}
 			cur_zone = cur_zone->next;

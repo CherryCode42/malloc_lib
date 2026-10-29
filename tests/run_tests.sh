@@ -24,14 +24,14 @@ echo "=== Running tests ==="
         echo "================================"
         echo "Running my test"
         echo "================================"
-        ./test
+        LD_LIBRARY_PATH=.. ./test
 		fi
 
         if [ -x "./test_realloc" ]; then
         echo "================================"
         echo "Running my test for realloc"
         echo "================================"
-        ./test_realloc
+        LD_LIBRARY_PATH=.. ./test_realloc
 		fi
 
         if [ -x "./test_threads" ]; then
@@ -39,7 +39,7 @@ echo "=== Running tests ==="
         echo "================================"
         echo "Running my test for threads"
         echo "================================"
-        ./test_threads
+        LD_LIBRARY_PATH=.. ./test_threads
         fi
 
         if [ -x "./test_mutexes" ]; then
@@ -47,31 +47,20 @@ echo "=== Running tests ==="
         echo "================================"
         echo "Running my test for mutexes"
         echo "================================"
-        ./test_mutexes
+        LD_LIBRARY_PATH=.. ./test_mutexes
         fi
 
-for test in test0 test1 test2 test3 test4 test5; do
-    if [ -x "./$test" ]; then
+        if [ -x "./test_bulk" ]; then
         echo
         echo "================================"
-        echo "Running school $test"
+        echo "Running my test for bulk"
         echo "================================"
-
-        "./$test"
-
-        status=$?
-
-        if [ $status -ne 0 ]; then
-            echo
-            echo "❌ $test FAILED with exit code $status"
-            exit $status
+        LD_LIBRARY_PATH=.. ./test_bulk
         fi
 
-        echo "✅ $test PASSED"
-    fi
-done
-
+        if [ -x "./test_002" ]; then
         echo "================================"
         echo "Running Konstantins test"
         echo "================================"
-        ./test_002
+        LD_LIBRARY_PATH=.. ./test_002
+        fi

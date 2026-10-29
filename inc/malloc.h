@@ -111,7 +111,7 @@ void print_realloc_log(void* ptr, size_t size);
 
 //printing memory
 void	show_alloc_mem();
-void	show_alloc_mem_ex();
+void	show_alloc_mem_ex(const char *mode);
 
 //debug_env
 void ensure_debug_config( );

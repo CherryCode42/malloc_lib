@@ -65,6 +65,6 @@ int main(void)
 	free(ptr_large);
 	free(ptr_lagre_1);
 
-	show_alloc_mem_ex();
+	show_alloc_mem_ex("HISTORY");
 	return (0);
 }

@@ -23,7 +23,7 @@ int main() {
 	ptr_large = realloc(ptr_large, 490000);
 
 	show_alloc_mem();
-	show_alloc_mem_ex();
+	//show_alloc_mem_ex();
 
 	return(0);
 }
